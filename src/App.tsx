@@ -7,6 +7,7 @@ import RootBody from "./components/elements/RootBody";
 import RootFooter from "./components/elements/RootFooter";
 import MessageBox from "./components/combo/message/MessageBox";
 import ModalBox from "./components/combo/modal/ModalBox";
+import Header from "./components/elements/Header";
 import Loading from "./components/elements/Loading";
 
 function App(): JSX.Element {
@@ -14,7 +15,9 @@ function App(): JSX.Element {
         <div className="App">
             <MessageBox />
             <ModalBox />
-            <RootHeader></RootHeader>
+            <RootHeader>
+                <Header />
+            </RootHeader>
             <RootBody>
                 <Suspense
                     fallback={<Loading loading content="loading" type="" />}
