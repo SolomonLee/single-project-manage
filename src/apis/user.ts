@@ -19,10 +19,10 @@ const getUserInfoLoog = async (): Promise<Result<User>> => {
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
         return await promiseTimer(() => getUserInfo(), 1000);
     } catch (e) {
-        console.log("載入玩家資料發生錯誤 ", e);
+        console.log("載入使用者資料發生錯誤 ", e);
     }
 
-    return resultError("載入玩家資料發生錯誤", <User>{});
+    return resultError("載入使用者資料發生錯誤", <User>{});
 };
 
 export const getUserInfo = async (): Promise<Result<User>> => {
@@ -35,7 +35,7 @@ export const getUserInfo = async (): Promise<Result<User>> => {
         if (typeof getUserInfo.data.result === "undefined") throw new Error();
 
         if (getUserInfo.data.result !== true) {
-            if (getUserInfo.data.resultMsg === "取得玩家資訊發生錯誤!") {
+            if (getUserInfo.data.resultMsg === "取得使用者資訊發生錯誤!") {
                 const result = await promiseTimer(getUserInfoLoog, 1000);
                 return result;
             }
@@ -43,8 +43,8 @@ export const getUserInfo = async (): Promise<Result<User>> => {
             return resultOk(getUserInfo.data.datas);
         }
     } catch (e) {
-        console.log("載入玩家資料發生錯誤 ", e);
+        console.log("載入使用者資料發生錯誤 ", e);
     }
 
-    return resultError("載入玩家資料發生錯誤", <User>{});
+    return resultError("載入使用者資料發生錯誤", <User>{});
 };

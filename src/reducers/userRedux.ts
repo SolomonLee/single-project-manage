@@ -2,16 +2,15 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import * as apiAuth from "../apis/auth";
 import * as apiUser from "../apis/user";
 import { resultError /* , resultOk */ } from "../apis/result";
+import addMessage from "../components/combo/message/Message";
 import { RootState } from "./store";
 
 interface UserState extends apiUser.User {
     inSignIn: boolean;
-    signInErrorMsg: string;
 }
 
 const initialState = <UserState>{
     inSignIn: false,
-    signInErrorMsg: "",
     email: "",
     userName: "",
 };
@@ -45,6 +44,15 @@ export const registerAsync = createAsyncThunk(
     }
 ); // registerAsync()
 
+/** 當 firebase auth 自動登入時 */
+export const getUserInfoAsync = createAsyncThunk(
+    "gamerRedux/getGamerInfoAsync",
+    async () => {
+        const resultGetUserInfo = await apiUser.getUserInfo();
+        return resultGetUserInfo;
+    }
+); // getUserInfoAsync()
+
 export const userSlice = createSlice({
     name: "user",
     initialState,
@@ -53,7 +61,7 @@ export const userSlice = createSlice({
             apiAuth.signOut();
             state.email = initialState.email;
             state.userName = initialState.userName;
-            state.signInErrorMsg = initialState.signInErrorMsg;
+            addMessage("登出成功!", "Ok");
         },
     },
     extraReducers: (builder) => {
@@ -61,7 +69,6 @@ export const userSlice = createSlice({
         builder.addCase(signInAsync.pending, (state) => {
             state.email = initialState.email;
             state.userName = initialState.userName;
-            state.signInErrorMsg = "";
             state.inSignIn = true;
         });
         builder.addCase(signInAsync.fulfilled, (state, action) => {
@@ -71,29 +78,28 @@ export const userSlice = createSlice({
                 const user = action.payload.datas;
 
                 state.email = user.email;
-                state.userName = initialState.userName;
-                state.signInErrorMsg = "";
+                state.userName = user.userName;
+                addMessage("登入成功!", "Ok");
             } else {
-                state.signInErrorMsg = action.payload.resultMsg;
+                addMessage(action.payload.resultMsg, "Fail");
             }
         });
         builder.addCase(signInAsync.rejected, (state) => {
             state.inSignIn = false;
-            state.signInErrorMsg = "登入時出現未知的錯誤";
+            addMessage("登入時出現未知的錯誤", "Fail");
         });
         // signInAsync : END
 
         // registerAsync : START
         builder.addCase(registerAsync.pending, (state) => {
             state.inSignIn = true;
-            state.signInErrorMsg = "";
         });
         builder.addCase(registerAsync.fulfilled, (state, action) => {
             if (action.payload.result) {
-                state.signInErrorMsg = "";
+                addMessage("註冊成功!", "Ok");
             } else {
                 state.inSignIn = false;
-                state.signInErrorMsg = action.payload.resultMsg;
+                addMessage(action.payload.resultMsg, "Fail");
             }
         });
 
@@ -101,9 +107,31 @@ export const userSlice = createSlice({
             state.inSignIn = false;
             state.email = "";
             state.userName = initialState.userName;
-            state.signInErrorMsg = "註冊時出現未知的錯誤";
+            addMessage("註冊時出現未知的錯誤", "Fail");
         });
         // registerAsync : END
+
+        // getUserInfoAsync : START
+        builder.addCase(getUserInfoAsync.pending, (state) => {
+            state.inSignIn = true;
+        });
+        builder.addCase(getUserInfoAsync.fulfilled, (state, action) => {
+            state.inSignIn = false;
+
+            if (action.payload.result) {
+                const user = action.payload.datas;
+                state.email = user.email;
+                state.userName = user.userName;
+                addMessage("自動登入成功!", "Ok");
+            }
+        });
+
+        builder.addCase(getUserInfoAsync.rejected, (state) => {
+            state.inSignIn = false;
+            state.email = "";
+            addMessage("取得玩家資訊時出現未知的錯誤", "Fail");
+        });
+        // getUserInfoAsync : END
     },
 });
 
@@ -113,7 +141,5 @@ export const selectUserEmail = (state: RootState): string => state.user.email;
 export const selectUserName = (state: RootState): string => state.user.userName;
 export const selectUserInSignIn = (state: RootState): boolean =>
     state.user.inSignIn;
-export const selectUserSignInErrorMsg = (state: RootState): string =>
-    state.user.signInErrorMsg;
 
 export default userSlice.reducer;
