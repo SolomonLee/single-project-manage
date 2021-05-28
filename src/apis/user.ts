@@ -48,3 +48,21 @@ export const getUserInfo = async (): Promise<Result<User>> => {
 
     return resultError("載入使用者資料發生錯誤", <User>{});
 };
+
+export const updateOnlineTime = async (): Promise<Result<null>> => {
+    try {
+        // eslint-disable-next-line no-shadow
+        const updateOnlineTimeResult = await firebase
+            .functions()
+            .httpsCallable("updateOnlineTime")();
+
+        if (typeof updateOnlineTimeResult.data.result === "undefined")
+            throw new Error();
+
+        return resultOk(null);
+    } catch (e) {
+        console.log("自動更新使用者上線時間發生錯誤 ", e);
+    }
+
+    return resultError("自動更新使用者上線時間發生錯誤", null);
+};

@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import firebase from "firebase/app";
 import "firebase/firestore";
-import { useSelector } from "react-redux";
-import { selectUserEmail } from "../reducers/userRedux";
+import { useIfSingIn } from "./authHook";
+import { useGetMount } from "./controlComponent";
 
 export interface Member {
     id: string;
@@ -20,15 +20,12 @@ export interface MemberSimpleList {
 }
 
 export const useSubMemberList = (): Member[] => {
-    const refIsMount = useRef(false);
+    const refIsMount = useGetMount();
     const refSubMember = useRef<undefined | (() => void)>(undefined);
-    const userEmail = useSelector(selectUserEmail);
     const [memberList, setMemberList] = useState<Member[]>([]);
 
-    useEffect(() => {
-        refIsMount.current = true;
-
-        if (userEmail.length) {
+    useIfSingIn(
+        () => {
             if (typeof refSubMember.current === "undefined") {
                 setTimeout(() => {
                     refSubMember.current = firebase
@@ -58,27 +55,28 @@ export const useSubMemberList = (): Member[] => {
                                 }
                             }
 
+                            tempMemberList.sort((a, b): number => {
+                                return b.onlineTimestamp - a.onlineTimestamp;
+                            });
+
                             setMemberList(tempMemberList);
                         });
                 });
-            }
-        } else {
-            if (memberList.length) {
-                if (refIsMount.current) {
-                    setMemberList([]);
+            } else {
+                if (memberList.length) {
+                    if (refIsMount.current) {
+                        setMemberList([]);
+                    }
                 }
             }
-        }
-
-        return () => {
-            refIsMount.current = false;
-
+        },
+        () => {
             if (typeof refSubMember.current !== "undefined") {
                 refSubMember.current();
                 refSubMember.current = undefined;
             }
-        };
-    }, [userEmail]);
+        }
+    );
 
     return memberList;
 };
