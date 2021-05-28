@@ -1,4 +1,4 @@
-import React, { Suspense } from "react";
+import React from "react";
 
 import RootHeader from "./components/elements/RootHeader";
 import RootBody from "./components/elements/RootBody";
@@ -12,8 +12,8 @@ import RoutePages from "./components/pages/route/RoutePages";
 function App(): JSX.Element {
     return (
         <div className="App">
-            <MessageBox />
             <ModalBox />
+            <MessageBox />
             <RootHeader>
                 <Header />
             </RootHeader>

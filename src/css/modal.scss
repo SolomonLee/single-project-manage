@@ -1,0 +1,48 @@
+body.modal-open {
+    overflow: hidden;
+
+    #ModalBox {
+        display: block;
+    }
+}
+
+#ModalBox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
+    z-index: 1;
+}
+
+.modal-mask {
+    position: fixed;
+    z-index: 0;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #c1c0c05c;
+}
+
+.modal {
+    width: 550px;
+    max-width: calc(98vw);
+    background: $subColor3;
+    color: #fff;
+    margin: 60px auto;
+    padding: 50px 30px;
+    border-radius: 8px;
+    position: relative;
+    display: block;
+    height: auto;
+
+    .close {
+        background: transparent;
+        border: none;
+        position: absolute;
+        right: 20px;
+        top: 18px;
+    }
+}

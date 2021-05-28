@@ -1,0 +1,81 @@
+#MessageBox {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    right: 2vw;
+    bottom: 3vh;
+    opacity: 0.5;
+
+    &:hover {
+        opacity: 1;
+    }
+
+    .message_item {
+        display: flex;
+        background: #383232;
+        border-radius: $radius1;
+        color: #fff;
+        margin-bottom: 0;
+
+        & > .item_title {
+            text-align: center;
+            height: 50px;
+            width: 40px;
+            display: inline-block;
+            line-height: 28px;
+
+            .message_state {
+                display: inline-block;
+                width: 10px;
+                height: 10px;
+                border-radius: 30px;
+                background-color: #fff;
+
+                &[data-state="Common"] {
+                    background-color: rgb(125, 148, 248);
+                }
+
+                &[data-state="Fail"] {
+                    background-color: rgb(185, 104, 104);
+                }
+
+                &[data-state="Ok"] {
+                    background-color: rgb(164, 247, 191);
+                }
+            }
+        }
+
+        & > .item_content {
+            max-width: 260px;
+            line-height: 50px;
+            border-left: 1px solid #fff;
+            padding-left: 18px;
+            padding-right: 18px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        & + .message_item {
+            border-radius: 0;
+            border-top: 1px solid #fff;
+
+            &:last-child {
+                border-bottom-left-radius: $radius1;
+                border-bottom-right-radius: $radius1;
+            }
+        }
+
+        &:not(:only-child) {
+            &:first-child {
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+        }
+    }
+}
+.modal-open #MessageBox {
+    opacity: 1;
+}
