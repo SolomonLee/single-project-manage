@@ -1,6 +1,7 @@
 import React from "react";
 import MemberOnlineState from "./MemberOnlineState";
 
+/** 給 會員列表使用 */
 export interface MemberInfo {
     id: string;
     name: string;

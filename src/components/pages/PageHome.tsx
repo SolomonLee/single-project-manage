@@ -1,29 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import MemberList from "../combo/member/MemberList";
-import { MemberInfo } from "../combo/member/Member";
+import { useSubMemberList } from "../../hooks/autoSubscribe";
 
 const PageHome = (): JSX.Element => {
-    const [memberList, setMemberList] = useState<MemberInfo[]>([]);
-
-    useEffect(() => {
-        setMemberList([
-            {
-                id: "11111",
-                name: "solo1111",
-                onlineTimestamp: 1632191873542,
-            },
-            {
-                id: "22222",
-                name: "solo2222",
-                onlineTimestamp: 1422191873542,
-            },
-            {
-                id: "33333",
-                name: "solo3333",
-                onlineTimestamp: 1622190873542,
-            },
-        ]);
-    }, []);
+    const memberList = useSubMemberList();
 
     return (
         <div className="container">
