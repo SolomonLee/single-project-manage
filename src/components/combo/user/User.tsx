@@ -1,4 +1,4 @@
-import React, { MouseEvent, useEffect, useState } from "react";
+import React, { MouseEvent, useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
     signOut,
@@ -11,12 +11,16 @@ import {
 } from "../../../reducers/userRedux";
 import Modal from "../modal/Modal";
 import SignInForm from "../form/signIn/SignInForm";
-import { useAuthStateChanged } from "../../../hooks/authHook";
+import {
+    useAuthStateChanged,
+    useAutoUpdateOnlineTime,
+} from "../../../hooks/authHook";
 
 const User = (): JSX.Element => {
     const userEmail = useSelector(selectUserEmail);
     const userName = useSelector(selectUserName);
     const inSignIn = useSelector(selectUserInSignIn);
+    useAutoUpdateOnlineTime();
 
     const dispatch = useDispatch();
 

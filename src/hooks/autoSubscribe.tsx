@@ -31,32 +31,22 @@ export const useSubMemberList = (): Member[] => {
                     refSubMember.current = firebase
                         .firestore()
                         .collection("users-simple-infos")
-                        .doc("infos")
-                        .onSnapshot((doc) => {
-                            console.log("useSubMemberList doc", doc);
+                        .orderBy("onlineTimestamp", "desc")
+                        .onSnapshot((querySnapshot) => {
                             const tempMemberList = [] as Member[];
-                            if (refIsMount.current) {
-                                const memberSimpleList = doc.data() as
-                                    | MemberSimpleList
-                                    | undefined;
 
-                                if (typeof memberSimpleList !== "undefined") {
-                                    for (const [
-                                        uid,
-                                        memberSimple,
-                                    ] of Object.entries(memberSimpleList)) {
-                                        tempMemberList.push({
-                                            id: uid,
-                                            name: memberSimple.name,
-                                            onlineTimestamp:
-                                                memberSimple.onlineTimestamp,
-                                        });
-                                    }
+                            querySnapshot.forEach((doc) => {
+                                if (!doc.exists || refIsMount.current) {
+                                    const memberSimple =
+                                        doc.data() as MemberSimple;
+
+                                    tempMemberList.push({
+                                        id: doc.id,
+                                        name: memberSimple.name,
+                                        onlineTimestamp:
+                                            memberSimple.onlineTimestamp,
+                                    });
                                 }
-                            }
-
-                            tempMemberList.sort((a, b): number => {
-                                return b.onlineTimestamp - a.onlineTimestamp;
                             });
 
                             setMemberList(tempMemberList);
