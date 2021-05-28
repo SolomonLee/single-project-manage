@@ -1,1 +1,170 @@
 @import "bootstrap-scss/bootstrap.scss";
+@import "bootstrap-icons/font/bootstrap-icons";
+
+@import "config.scss";
+@import "basic.scss";
+
+// ===== ELEMENT : START =====
+.header {
+    display: flex;
+    justify-content: center;
+    background: $mainColor;
+    color: $subColor2;
+    height: 40px;
+    line-height: 40px;
+    flex: 1;
+    padding: 4px;
+
+    .functions {
+        text-align: left;
+        width: 100px;
+        overflow: hidden;
+        white-space: nowrap;
+
+        &:last-child {
+            text-align: right;
+        }
+
+        a {
+            border-radius: 5px;
+            display: inline-block;
+            background-color: $subColor;
+            color: #fff;
+            height: 32px;
+            line-height: 32px;
+            width: 32px;
+            text-align: center;
+            vertical-align: top;
+
+            & + a {
+                margin-left: 4px;
+            }
+        }
+    }
+
+    .title {
+        text-align: left;
+        font-size: 1rem;
+        font-weight: bold;
+        letter-spacing: 1.2px;
+        padding-right: 10px;
+        flex: 100;
+        text-align: center;
+        line-height: 32px;
+
+        .logo {
+            display: inline-block;
+            width: 26px;
+            height: 20px;
+            line-height: 20px;
+
+            img {
+                vertical-align: bottom;
+            }
+        }
+    }
+}
+
+footer {
+    background: #026aa7;
+    color: #80b4d3;
+}
+
+.user {
+    display: inline-block;
+    border-radius: 30px;
+    background: #dfe1e6;
+    line-height: 32px;
+    width: 32px;
+    overflow: hidden;
+    text-align: center;
+
+    > span {
+        color: #172b4d;
+        font-size: 9px;
+        display: flex;
+        justify-content: center;
+    }
+}
+// ===== ELEMENT : END =====
+
+// ===== BOX : START =====
+[class$="_box"] {
+    margin-bottom: 1.5rem;
+    position: relative;
+
+    > .box_title {
+        padding-top: 14px;
+        padding-bottom: 20px;
+        font-size: 1.8rem;
+        text-align: center;
+        letter-spacing: 2px;
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.member_list_box {
+} // member_list_box
+// ===== BOX : END =====
+
+// ===== ITEM : START =====
+[class$="_item"] {
+    margin-bottom: var(--item-margin-bottom);
+    position: relative;
+
+    > .item_title {
+        padding-top: 8px;
+        padding-bottom: 14px;
+        font-size: 1.2rem;
+        letter-spacing: 1px;
+    }
+}
+
+.member_item {
+    background-color: $subColor2;
+    color: #fff;
+    padding: 6px 10px;
+
+    .item_content {
+        text-align: left;
+
+        .name {
+        }
+
+        .online_state {
+            font-size: 14px;
+
+            &::before {
+                content: "";
+                display: inline-block;
+                width: 8px;
+                height: 8px;
+                background-color: #fff;
+                border-radius: 30px;
+                margin-right: 4px;
+            }
+
+            &[data-type="Online"] {
+                $onlineColor: #00ff22;
+                color: $onlineColor;
+                &::before {
+                    background-color: $onlineColor;
+                }
+            }
+
+            &[data-type="Offline"] {
+                $offlineColor: rgb(61, 62, 64);
+                color: $offlineColor;
+
+                &::before {
+                    background-color: $offlineColor;
+                }
+            }
+        }
+    }
+}
+
+// ===== ITEM : END =====
