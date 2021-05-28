@@ -1,6 +1,4 @@
 import React, { Suspense } from "react";
-import { Switch } from "react-router-dom";
-import { routes, RouteWithSubRoutes } from "./route/route";
 
 import RootHeader from "./components/elements/RootHeader";
 import RootBody from "./components/elements/RootBody";
@@ -8,7 +6,8 @@ import RootFooter from "./components/elements/RootFooter";
 import MessageBox from "./components/combo/message/MessageBox";
 import ModalBox from "./components/combo/modal/ModalBox";
 import Header from "./components/elements/Header";
-import Loading from "./components/elements/Loading";
+
+import RoutePages from "./components/pages/route/RoutePages";
 
 function App(): JSX.Element {
     return (
@@ -19,20 +18,7 @@ function App(): JSX.Element {
                 <Header />
             </RootHeader>
             <RootBody>
-                <Suspense
-                    fallback={<Loading loading content="loading" type="" />}
-                >
-                    <Switch>
-                        {routes.map((route) => (
-                            <RouteWithSubRoutes
-                                key={route.path}
-                                path={route.path}
-                                routes={route.routes}
-                                component={route.component}
-                            />
-                        ))}
-                    </Switch>
-                </Suspense>
+                <RoutePages />
             </RootBody>
             <RootFooter>2021 by Solomon</RootFooter>
         </div>
