@@ -1,62 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { DragDropContext, Droppable } from "react-beautiful-dnd";
-import DndList, { DndListType } from "./list/List";
+import {
+    DragDropContext,
+    Droppable,
+    DropResult,
+    ResponderProvided,
+} from "react-beautiful-dnd";
+import {
+    ListCardDatas,
+    useSubListCardDatas,
+} from "../../../hooks/autoSubscribe";
+import DndList from "./list/List";
 
 const Table = (): JSX.Element => {
-    const [listDatas, setListDatas] = useState<DndListType[]>([]);
+    const subListCardDatas = useSubListCardDatas();
+    const [listCardDatas, setListCardDatas] = useState<ListCardDatas[]>([]);
 
     useEffect(() => {
-        setListDatas([
-            {
-                index: 0,
-                listId: "LISTA",
-                listType: "LIST",
-                listName: "IM LIST A",
-                cards: [
-                    {
-                        name: "Card A",
-                        id: "Card A",
-                    },
-                    {
-                        name: "Card B",
-                        id: "Card B",
-                    },
-                    {
-                        name: "Card C",
-                        id: "Card C",
-                    },
-                ],
-                isScrollable: false,
-                isCombineEnabled: false,
-            },
+        console.log("listCardDatas", subListCardDatas);
+        setListCardDatas(subListCardDatas);
+    }, [subListCardDatas]);
 
-            {
-                index: 2,
-                listId: "LISTB",
-                listType: "LIST",
-                listName: "IM LIST B",
-                cards: [
-                    {
-                        name: "Card D",
-                        id: "Card D",
-                    },
-                    {
-                        name: "Card E",
-                        id: "Card E",
-                    },
-                    {
-                        name: "Card F",
-                        id: "Card F",
-                    },
-                ],
-                isScrollable: false,
-                isCombineEnabled: false,
-            },
-        ]);
-    }, []);
-
-    const onDragEnd = (result: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const onDragEnd = (result: DropResult, provided: ResponderProvided) => {
         console.log(result);
+        if (result.type === "LIST") {
+            console.log("LIST MOVE");
+        }
         // if (result.combine) {
         //   if (result.type === "LIST") {
         //     const shallow = [...this.state.ordered];
@@ -118,16 +87,10 @@ const Table = (): JSX.Element => {
                         ref={provided.innerRef}
                         {...provided.droppableProps}
                     >
-                        {listDatas.map((listData, index) => (
+                        {listCardDatas.map((listCardData) => (
                             <DndList
-                                key={listData.listId}
-                                index={index}
-                                listName={listData.listName}
-                                listId={listData.listId}
-                                listType={listData.listType}
-                                cards={listData.cards}
-                                isScrollable={false}
-                                isCombineEnabled={false}
+                                key={listCardData.listId}
+                                list={listCardData}
                             />
                         ))}
                         {provided.placeholder}

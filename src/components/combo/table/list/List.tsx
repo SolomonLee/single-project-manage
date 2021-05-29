@@ -1,15 +1,16 @@
 import React from "react";
 import { Droppable, Draggable } from "react-beautiful-dnd";
-import DndCard, { DndCardDataType } from "../card/Card";
+import { Card, ListCardDatas } from "../../../../hooks/autoSubscribe";
+import DndCard from "../card/Card";
 
-interface DndListItemsType {
+interface DndListBoxContentProps {
     listId: string;
-    cards: DndCardDataType[];
+    cards: Card[];
 }
 const DndListBoxContent = ({
     cards,
     listId,
-}: DndListItemsType): JSX.Element => {
+}: DndListBoxContentProps): JSX.Element => {
     return (
         <Droppable droppableId={listId} type="CARD">
             {(provided) => (
@@ -18,8 +19,8 @@ const DndListBoxContent = ({
                     ref={provided.innerRef}
                     {...provided.droppableProps}
                 >
-                    {cards.map((card, index) => (
-                        <DndCard key={card.id} data={card} index={index} />
+                    {cards.map((card) => (
+                        <DndCard key={card.cardId} card={card} />
                     ))}
                     {provided.placeholder}
                 </div>
@@ -28,24 +29,12 @@ const DndListBoxContent = ({
     );
 };
 
-export interface DndListType {
-    index: number;
-    listId: string;
-    listType: string;
-    listName: string;
-    cards: DndCardDataType[];
-    isScrollable: boolean;
-    isCombineEnabled: boolean;
+interface Props {
+    list: ListCardDatas;
 }
-
-const DndList = ({
-    cards,
-    listId,
-    listName,
-    index,
-}: DndListType): JSX.Element => {
+const DndList = ({ list }: Props): JSX.Element => {
     return (
-        <Draggable draggableId={listId} index={index}>
+        <Draggable draggableId={list.listId} index={list.index}>
             {(provided) => (
                 <div
                     className="dnd_list_box"
@@ -53,10 +42,13 @@ const DndList = ({
                     {...provided.draggableProps}
                 >
                     <div className="box_title" {...provided.dragHandleProps}>
-                        <h1>{listName}</h1>
+                        <h1>{list.name}</h1>
                     </div>
 
-                    <DndListBoxContent cards={cards} listId={listId} />
+                    <DndListBoxContent
+                        cards={list.cards}
+                        listId={list.listId}
+                    />
                 </div>
             )}
         </Draggable>

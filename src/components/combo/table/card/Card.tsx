@@ -1,18 +1,17 @@
 import React from "react";
 import { Draggable } from "react-beautiful-dnd";
+import { Card } from "../../../../hooks/autoSubscribe";
 
-export interface DndCardDataType {
-    name: string;
-    id: string;
+export interface Props {
+    card: Card;
 }
-
-export interface DndCardType {
-    data: DndCardDataType;
-    index: number;
-}
-const DndCard = ({ data, index }: DndCardType): JSX.Element => {
+const DndCard = ({ card: data }: Props): JSX.Element => {
     return (
-        <Draggable key={data.id} draggableId={data.id} index={index}>
+        <Draggable
+            key={data.cardId}
+            draggableId={data.cardId}
+            index={data.index}
+        >
             {(provided, dragSnapshot) => (
                 <div
                     className="dnd_card"

@@ -1,4 +1,4 @@
-import React, { MouseEvent, useEffect, useRef, useState } from "react";
+import React, { MouseEvent, useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
     signOut,

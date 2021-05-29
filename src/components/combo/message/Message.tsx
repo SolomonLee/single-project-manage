@@ -10,6 +10,8 @@ interface MessageData extends MessageDataBase {
     id: string;
 }
 
+let elementMessageBox = document.getElementById("MessageBox");
+
 const MessageList = (messageDatas: MessageData[]): void => {
     const element = messageDatas.map((messageData) => (
         <div className="message_item" key={messageData.id}>
@@ -23,7 +25,13 @@ const MessageList = (messageDatas: MessageData[]): void => {
         </div>
     ));
 
-    ReactDOM.render(element, document.getElementById("MessageBox"));
+    if (elementMessageBox === null) {
+        elementMessageBox = document.getElementById("MessageBox");
+    }
+
+    if (elementMessageBox !== null) {
+        ReactDOM.render(element, elementMessageBox);
+    }
 };
 
 const messageDatas: MessageData[] = [];
