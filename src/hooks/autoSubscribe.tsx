@@ -147,7 +147,7 @@ const sortListsByNextId = (
                     tempSortLists.push(findNextList);
                     nextList = findNextList;
                 } else {
-                    throw "ERROR";
+                    throw "sortListsByNextId ERROR";
                 }
             }
         }
@@ -193,18 +193,22 @@ const sortCardsByNextId = (
                     (cardId) => cardId === fListCard.cardId
                 ) === -1
             ) {
-                const tempSortListCards = [] as Card[];
-
                 let sortListCardsFirstId = "";
 
                 if (sortListCards.length > 0) {
                     sortListCardsFirstId = sortListCards[0].cardId;
                 }
 
-                tempSortListCards.push(fListCard);
-                let nextListCard = fListCard as Card;
+                const tempSortListCards = [fListCard];
+                let nextListCard = fListCard;
+                // console.log("====================");
                 for (;;) {
-                    if (nextListCard.nextCardId === sortListCardsFirstId) {
+                    // console.log("==========");
+                    // console.log("fListCard before", JSON.stringify(fListCard));
+                    if (
+                        nextListCard.nextCardId === sortListCardsFirstId ||
+                        nextListCard.nextCardId === ""
+                    ) {
                         for (
                             let i = tempSortListCards.length - 1;
                             i >= 0;
@@ -216,18 +220,35 @@ const sortCardsByNextId = (
                         break;
                     }
 
+                    // console.log(
+                    //     "fListCard find nextListCard.nextCardId",
+                    //     nextListCard.nextCardId,
+                    //     JSON.stringify(filterListCards)
+                    // );
                     const findNextListCard = filterListCards.find(
-                        (fListCard) =>
-                            fListCard.listId === nextListCard.nextCardId
+                        (fCard) => fCard.cardId === nextListCard.nextCardId
                     );
 
+                    // console.log(
+                    //     "fListCard after",
+                    //     JSON.stringify(findNextListCard)
+                    // );
+
                     if (typeof findNextListCard !== "undefined") {
+                        if (
+                            existListCardId.indexOf(findNextListCard.cardId) !==
+                            -1
+                        ) {
+                            throw "sortCardsByNextId ERROR #1";
+                        }
+
                         existListCardId.push(findNextListCard.cardId);
                         tempSortListCards.push(findNextListCard);
                         nextListCard = findNextListCard;
                     } else {
-                        throw "ERROR";
+                        throw "sortCardsByNextId ERROR #2";
                     }
+                    // console.log("==========");
                 }
             }
         });
@@ -252,7 +273,7 @@ const sortCardsByNextId = (
 export const resortListCardDatasByListCardDatas = (
     listCardDatasCollection: ListCardDatasCollection
 ): void => {
-    if (listCardDatasCollection.listCardDatas.length > 0) {
+    if (listCardDatasCollection.listCardDatas.length > 1) {
         for (
             let i = 1;
             i <= listCardDatasCollection.listCardDatas.length - 2;
@@ -278,41 +299,56 @@ export const resortListCardDatasByListCardDatas = (
             listCardDatasCollection.listCardDatas[
                 listCardDatasCollection.listCardDatas.length - 2
             ].list.listId;
+    } else if (listCardDatasCollection.listCardDatas.length === 1) {
+        listCardDatasCollection.listCardDatas[0].list.index = 0;
+        listCardDatasCollection.listCardDatas[0].list.nextListId = "";
+        listCardDatasCollection.listCardDatas[0].list.prevListId = "";
     }
 };
 
 /** 當藉由修改 ListCardDatas 內的 Cards 順序時, 更新列表順序 */
-export const resortListCards = (cards1: Card[], cards2: Card[]): void => {
-    console.log("in resortListCards");
-    const sortCards = (cards: Card[]) => {
-        console.log("resortListCards before", JSON.stringify(cards));
+export const resortListCards = (
+    listCardDatas1: ListCardDatas,
+    listCardDatas2: ListCardDatas | null
+): void => {
+    const sortCards = (cards: Card[], listId: string) => {
         if (cards.length > 1) {
             for (let i = 1; i <= cards.length - 2; i++) {
                 cards[i].index = i;
                 cards[i].nextCardId = cards[i + 1].cardId;
                 cards[i].prevCardId = cards[i - 1].cardId;
+                cards[i].prevCardId = cards[i - 1].cardId;
+                cards[i].listId = listId;
             }
 
             cards[0].index = 0;
             cards[0].prevCardId = "";
             cards[0].nextCardId = cards[1].cardId;
+            cards[0].listId = listId;
 
             const lastIndex = cards.length - 1;
             cards[lastIndex].index = lastIndex;
             cards[lastIndex].prevCardId = cards[lastIndex - 1].cardId;
             cards[lastIndex].nextCardId = "";
+            cards[lastIndex].listId = listId;
+        } else if (cards.length === 1) {
+            cards[0].index = 0;
+            cards[0].prevCardId = "";
+            cards[0].nextCardId = "";
+            cards[0].listId = listId;
         }
-        console.log("resortListCards after", JSON.stringify(cards));
     };
 
-    if (cards1.length > 0) {
-        console.log("resortListCards sortCards cards1", cards1);
-        sortCards(cards1);
+    if (listCardDatas1.cards.length > 0) {
+        sortCards(listCardDatas1.cards, listCardDatas1.list.listId);
     }
 
-    if (cards1 != cards2 && cards2.length > 0) {
-        console.log("resortListCards sortCards cards2", cards1);
-        sortCards(cards2);
+    if (
+        listCardDatas2 !== null &&
+        listCardDatas1 !== listCardDatas2 &&
+        listCardDatas2.cards.length > 0
+    ) {
+        sortCards(listCardDatas2.cards, listCardDatas2.list.listId);
     }
 };
 

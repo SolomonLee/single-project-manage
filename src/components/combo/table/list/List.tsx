@@ -1,6 +1,7 @@
 import React from "react";
 import { Droppable, Draggable } from "react-beautiful-dnd";
 import { Card, ListCardDatas } from "../../../../hooks/autoSubscribe";
+import AddDndCardBox from "../card/AddCardBox";
 import DndCard from "../card/Card";
 
 interface DndListBoxContentProps {
@@ -31,9 +32,14 @@ const DndListBoxContent = ({
 
 interface Props {
     listCardDatas: ListCardDatas;
+    handleCreateCard: (
+        listId: string,
+        name: string,
+        nextCardId: string
+    ) => void;
 }
-const DndList = ({ listCardDatas }: Props): JSX.Element => {
-    console.log("listCardDatas.list.index", listCardDatas.list.index);
+const DndList = ({ listCardDatas, handleCreateCard }: Props): JSX.Element => {
+    // console.log("listCardDatas.list.index", listCardDatas.list.index);
     return (
         <Draggable
             draggableId={listCardDatas.list.listId}
@@ -48,6 +54,16 @@ const DndList = ({ listCardDatas }: Props): JSX.Element => {
                     <div className="box_title" {...provided.dragHandleProps}>
                         <h1>{listCardDatas.list.name}</h1>
                     </div>
+
+                    <AddDndCardBox
+                        listId={listCardDatas.list.listId}
+                        handleCreateCard={handleCreateCard}
+                        nextCardId={
+                            listCardDatas.cards.length > 0
+                                ? listCardDatas.cards[0].cardId
+                                : ""
+                        }
+                    />
 
                     <DndListBoxContent
                         cards={listCardDatas.cards}

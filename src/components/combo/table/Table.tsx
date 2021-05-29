@@ -6,11 +6,19 @@ import {
     /*ResponderProvided,*/
 } from "react-beautiful-dnd";
 import {
+    createCard,
+    createList,
+    updateBatchCard,
+    // UpdateCardData,
+} from "../../../apis/table";
+import {
     resortListCardDatasByListCardDatas,
     ListCardDatasCollection,
     useSubListCardDatas,
     resortListCards,
+    Card,
 } from "../../../hooks/autoSubscribe";
+import AddListBox from "./list/AddListBox";
 import DndList from "./list/List";
 
 const Table = (): JSX.Element | null => {
@@ -22,11 +30,90 @@ const Table = (): JSX.Element | null => {
         setListCardDatasCol(subListCardDatasCollection);
     }, [subListCardDatasCollection]);
 
-    useEffect(() => {
-        console.log("listCardDatasCol Update");
-    }, [listCardDatasCol]);
+    // useEffect(() => {
+    //     console.log("listCardDatasCol Update");
+    // }, [listCardDatasCol]);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const handleCreateCard = (
+        listId: string,
+        name: string,
+        nextCardId: string
+    ) => {
+        if (listCardDatasCol === null) {
+            return;
+        }
+        const cardId = `Card_${Date.now()}`;
+
+        const listCardData = listCardDatasCol.listCardDatas.find(
+            (listCardData) => {
+                return listCardData.list.listId === listId;
+            }
+        );
+
+        if (typeof listCardData === "undefined") {
+            return;
+        }
+
+        listCardData.cards.splice(0, 0, {
+            cardId,
+            name,
+            nextCardId,
+            listId,
+            prevCardId: "",
+            index: 0,
+            content: "",
+            messageId: cardId,
+            members: [],
+        });
+
+        createCard(cardId, name, listId, nextCardId);
+        resortListCards(listCardData, null);
+        setListCardDatasCol({ ...listCardDatasCol });
+    };
+
+    const handleUpdateCards = (cards1: Card[], cards2: Card[]) => {
+        console.log("handleUpdateCards in", cards1, cards2);
+        let cards = [...cards1];
+        if (cards2 !== cards1 && cards2.length) {
+            cards = cards.concat(cards2);
+        }
+
+        const updateCards = cards.map((card) => ({
+            id: card.cardId,
+            content: card.content,
+            listId: card.listId,
+            name: card.name,
+            nextCardId: card.nextCardId,
+        }));
+
+        if (updateCards.length) {
+            console.log("updateCards", updateCards);
+            updateBatchCard(updateCards);
+        }
+    };
+
+    const handleCreateList = (name: string, nextListId: string) => {
+        if (listCardDatasCol === null) {
+            return;
+        }
+        const listId = `List_${Date.now()}`;
+
+        listCardDatasCol.listCardDatas.unshift({
+            list: {
+                listId,
+                name,
+                nextListId,
+                prevListId: "",
+                index: 0,
+            },
+            cards: [],
+        });
+
+        createList(listId, name, nextListId);
+        resortListCardDatasByListCardDatas(listCardDatasCol);
+        setListCardDatasCol({ ...listCardDatasCol });
+    };
+
     const onDragEnd = (
         result: DropResult /*, provided: ResponderProvided*/
     ) => {
@@ -78,12 +165,14 @@ const Table = (): JSX.Element | null => {
                 return listCardData.list.listId === sourceId;
             });
 
+            console.log("CARD MOVE #3");
             const destinationListCardData = listCardDatas.find(
                 (listCardData) => {
                     return listCardData.list.listId === droppableId;
                 }
             );
 
+            console.log("CARD MOVE #4");
             if (
                 typeof sourceListCardData === "undefined" ||
                 typeof destinationListCardData === "undefined"
@@ -94,7 +183,10 @@ const Table = (): JSX.Element | null => {
             const tempCard = sourceListCardData.cards.splice(sourceIndex, 1)[0];
             destinationListCardData.cards.splice(droppableIndex, 0, tempCard);
 
-            resortListCards(
+            console.log("CARD MOVE #5");
+            resortListCards(sourceListCardData, destinationListCardData);
+            console.log("CARD before Update");
+            handleUpdateCards(
                 sourceListCardData.cards,
                 destinationListCardData.cards
             );
@@ -115,10 +207,20 @@ const Table = (): JSX.Element | null => {
                         ref={provided.innerRef}
                         {...provided.droppableProps}
                     >
+                        <AddListBox
+                            nextListId={
+                                listCardDatasCol.listCardDatas.length > 0
+                                    ? listCardDatasCol.listCardDatas[0].list
+                                          .listId
+                                    : ""
+                            }
+                            handleCreateList={handleCreateList}
+                        />
                         {listCardDatasCol.listCardDatas.map((listCardData) => (
                             <DndList
                                 key={listCardData.list.listId}
                                 listCardDatas={listCardData}
+                                handleCreateCard={handleCreateCard}
                             />
                         ))}
                         {provided.placeholder}
