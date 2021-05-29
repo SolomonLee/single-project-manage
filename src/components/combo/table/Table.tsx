@@ -9,6 +9,7 @@ import {
     createCard,
     createList,
     updateBatchCard,
+    updateBatchList,
     // UpdateCardData,
 } from "../../../apis/table";
 import {
@@ -17,6 +18,7 @@ import {
     useSubListCardDatas,
     resortListCards,
     Card,
+    List,
 } from "../../../hooks/autoSubscribe";
 import AddListBox from "./list/AddListBox";
 import DndList from "./list/List";
@@ -114,6 +116,19 @@ const Table = (): JSX.Element | null => {
         setListCardDatasCol({ ...listCardDatasCol });
     };
 
+    const handleUpdateLists = (lists: List[]) => {
+        const updateLists = lists.map((list) => ({
+            id: list.listId,
+            name: list.name,
+            nextListId: list.nextListId,
+        }));
+
+        if (updateLists.length) {
+            console.log("updateLists", updateLists);
+            updateBatchList(updateLists);
+        }
+    };
+
     const onDragEnd = (
         result: DropResult /*, provided: ResponderProvided*/
     ) => {
@@ -136,6 +151,7 @@ const Table = (): JSX.Element | null => {
             listCardDatas.splice(result.destination.index, 0, tempListCardData);
 
             resortListCardDatasByListCardDatas(listCardDatasCol);
+            handleUpdateLists(listCardDatasCol.lists);
             setListCardDatasCol({ ...listCardDatasCol });
         }
 
