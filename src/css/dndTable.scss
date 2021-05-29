@@ -1,0 +1,25 @@
+.dnd_table_block {
+    border: 1px solid #7fb3d1;
+    padding: 20px;
+    border-radius: 8px;
+    display: flex;
+
+    .dnd_list_box {
+        display: inline-block;
+        background-color: #ebecf0;
+        padding: 20px;
+        border-radius: 3px;
+
+        & + .dnd_list_box {
+            margin-left: 20px;
+        }
+
+        .dnd_card {
+            padding: 12px 8px;
+            background-color: #fff;
+            box-shadow: 0 1px 0 #091e4240;
+            margin-bottom: 8px;
+            border-radius: 3px;
+        }
+    }
+}

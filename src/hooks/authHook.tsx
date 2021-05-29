@@ -51,6 +51,7 @@ export const useAutoUpdateOnlineTime = (): void => {
         () => {
             if (refTimerAutoUpdateOnline.current !== null) {
                 clearInterval(refTimerAutoUpdateOnline.current);
+                refTimerAutoUpdateOnline.current = null;
             }
         }
     );

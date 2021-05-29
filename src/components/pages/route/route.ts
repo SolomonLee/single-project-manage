@@ -19,6 +19,11 @@ export const routes: RouteType[] = [
         routes: null,
     },
     {
+        path: "/Table",
+        component: lazy(() => import("../PageTable")),
+        routes: null,
+    },
+    {
         path: "/",
         component: lazy(() => import("../PageHome")),
         routes: null,

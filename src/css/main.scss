@@ -5,6 +5,17 @@
 @import "basic.scss";
 @import "modal.scss";
 @import "message.scss";
+@import "page.scss";
+@import "dndTable.scss";
+
+// ===== FIX Bootstrap : START =====
+.container-fluid {
+    .row {
+        margin-right: 0;
+        margin-left: 0;
+    }
+}
+// ===== FIX Bootstrap : END =====
 
 // ===== ELEMENT : START =====
 .header {
