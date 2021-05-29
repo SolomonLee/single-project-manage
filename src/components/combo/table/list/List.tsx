@@ -30,11 +30,15 @@ const DndListBoxContent = ({
 };
 
 interface Props {
-    list: ListCardDatas;
+    listCardDatas: ListCardDatas;
 }
-const DndList = ({ list }: Props): JSX.Element => {
+const DndList = ({ listCardDatas }: Props): JSX.Element => {
+    console.log("listCardDatas.list.index", listCardDatas.list.index);
     return (
-        <Draggable draggableId={list.listId} index={list.index}>
+        <Draggable
+            draggableId={listCardDatas.list.listId}
+            index={listCardDatas.list.index}
+        >
             {(provided) => (
                 <div
                     className="dnd_list_box"
@@ -42,12 +46,12 @@ const DndList = ({ list }: Props): JSX.Element => {
                     {...provided.draggableProps}
                 >
                     <div className="box_title" {...provided.dragHandleProps}>
-                        <h1>{list.name}</h1>
+                        <h1>{listCardDatas.list.name}</h1>
                     </div>
 
                     <DndListBoxContent
-                        cards={list.cards}
-                        listId={list.listId}
+                        cards={listCardDatas.cards}
+                        listId={listCardDatas.list.listId}
                     />
                 </div>
             )}
