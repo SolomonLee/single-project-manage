@@ -6,6 +6,7 @@
     display: flex;
     align-items: flex-start;
     flex-direction: column;
+    user-select: none;
 
     & > .block_title {
         margin-bottom: 20px;
@@ -24,6 +25,7 @@
         border-radius: 3px;
         padding-bottom: 20px;
         width: 290px;
+        min-width: 290px;
 
         & + .dnd_list_box {
             margin-left: 20px;

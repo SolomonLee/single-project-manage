@@ -27,16 +27,20 @@ import {
     List,
     ListCardDatas,
 } from "../../../hooks/autoSubscribe";
+import { useGetMount } from "../../../hooks/controlComponent";
 import AddListBox from "./list/AddListBox";
 import DndList from "./list/List";
 
 const Table = (): JSX.Element | null => {
     const subListCardDatasCollection = useSubListCardDatas();
+    const isMount = useGetMount();
     const [listCardDatasCol, setListCardDatasCol] =
         useState<ListCardDatasCollection | null>(null);
 
     useEffect(() => {
-        setListCardDatasCol(subListCardDatasCollection);
+        if (isMount.current) {
+            setListCardDatasCol(subListCardDatasCollection);
+        }
     }, [subListCardDatasCollection]);
 
     // useEffect(() => {
@@ -81,7 +85,6 @@ const Table = (): JSX.Element | null => {
     };
 
     const handleUpdateCards = (cards1: Card[], cards2: Card[]) => {
-        console.log("handleUpdateCards in", cards1, cards2);
         let cards = [...cards1];
         if (cards2 !== cards1 && cards2.length) {
             cards = cards.concat(cards2);
@@ -96,7 +99,6 @@ const Table = (): JSX.Element | null => {
         }));
 
         if (updateCards.length) {
-            console.log("updateCards", updateCards);
             updateBatchCard(updateCards);
         }
     };
@@ -215,7 +217,6 @@ const Table = (): JSX.Element | null => {
         }));
 
         if (updateLists.length) {
-            console.log("updateLists", updateLists);
             updateBatchList(updateLists);
         }
     };
@@ -244,7 +245,6 @@ const Table = (): JSX.Element | null => {
     const onDragEnd = (
         result: DropResult /*, provided: ResponderProvided*/
     ) => {
-        console.log("result", result);
         if (result.type === "LIST") {
             if (
                 listCardDatasCol === null ||
@@ -268,7 +268,6 @@ const Table = (): JSX.Element | null => {
         }
 
         if (result.type === "CARD") {
-            console.log("CARD MOVE");
             if (
                 listCardDatasCol === null ||
                 typeof result.destination?.droppableId === "undefined" ||
@@ -279,8 +278,6 @@ const Table = (): JSX.Element | null => {
             ) {
                 return;
             }
-
-            console.log("CARD MOVE #2");
 
             const sourceId = result.source.droppableId;
             const sourceIndex = result.source.index;
@@ -293,14 +290,12 @@ const Table = (): JSX.Element | null => {
                 return listCardData.list.listId === sourceId;
             });
 
-            console.log("CARD MOVE #3");
             const destinationListCardData = listCardDatas.find(
                 (listCardData) => {
                     return listCardData.list.listId === droppableId;
                 }
             );
 
-            console.log("CARD MOVE #4");
             if (
                 typeof sourceListCardData === "undefined" ||
                 typeof destinationListCardData === "undefined"
@@ -311,9 +306,7 @@ const Table = (): JSX.Element | null => {
             const tempCard = sourceListCardData.cards.splice(sourceIndex, 1)[0];
             destinationListCardData.cards.splice(droppableIndex, 0, tempCard);
 
-            console.log("CARD MOVE #5");
             resortListCards(sourceListCardData, destinationListCardData);
-            console.log("CARD before Update");
             handleUpdateCards(
                 sourceListCardData.cards,
                 destinationListCardData.cards

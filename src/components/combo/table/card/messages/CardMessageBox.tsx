@@ -61,22 +61,18 @@ const CardMessageBox = ({ messageId }: Props): JSX.Element => {
     );
     const isMount = useGetMount();
     /** 讓迅速更新時畫面不會一直閃爍 */
-    const refTimerUpdateBatch = useRef<number | null>(null);
+    const refTimerUpdateBatch = useRef<number>(-2);
 
     // console.log("messageContents", messageContents);
     const userUid = useSelector(selectUserUid);
     const userName = useSelector(selectUserName);
 
     useEffect(() => {
-        if (refTimerUpdateBatch.current === null) {
-            refTimerUpdateBatch.current = -2;
-            setMessageContents(subMessageContents);
-        } else if (refTimerUpdateBatch.current === -2) {
-            refTimerUpdateBatch.current = -1;
+        if (refTimerUpdateBatch.current < 0) {
+            refTimerUpdateBatch.current = refTimerUpdateBatch.current + 1;
             setMessageContents(subMessageContents);
         } else {
             clearTimeout(refTimerUpdateBatch.current);
-
             refTimerUpdateBatch.current = window.setTimeout(() => {
                 if (isMount.current) {
                     setMessageContents(subMessageContents);
@@ -85,18 +81,16 @@ const CardMessageBox = ({ messageId }: Props): JSX.Element => {
         }
 
         return () => {
-            if (
-                refTimerUpdateBatch.current !== null &&
-                refTimerUpdateBatch.current > -1
-            ) {
+            if (refTimerUpdateBatch.current > 0) {
                 clearTimeout(refTimerUpdateBatch.current);
-                refTimerUpdateBatch.current = null;
+                refTimerUpdateBatch.current = -2;
+                // console.log("set refTimerUpdateBatch.current = -2");
             }
         };
     }, [subMessageContents]);
 
     const addContent = (content: string): boolean => {
-        console.log("add content :", messageId, content);
+        // console.log("add content :", messageId, content);
         const timestamp = Date.now();
         const contentId = `Content_${userUid}_${timestamp}`;
 
@@ -118,7 +112,7 @@ const CardMessageBox = ({ messageId }: Props): JSX.Element => {
     };
 
     const editContent = (contentId: string, content: string) => {
-        console.log("edit content :", messageId, contentId, content);
+        // console.log("edit content :", messageId, contentId, content);
         const messageContent = messageContents.find(
             (messageContent) => messageContent.contentId === contentId
         );
@@ -133,7 +127,7 @@ const CardMessageBox = ({ messageId }: Props): JSX.Element => {
     };
 
     const removeContent = (contentId: string) => {
-        console.log("remove content :", messageId, contentId);
+        // console.log("remove content :", messageId, contentId);
         const index = messageContents.findIndex(
             (messageContent) => messageContent.contentId === contentId
         );

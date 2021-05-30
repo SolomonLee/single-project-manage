@@ -3,6 +3,7 @@ import firebase from "firebase/app";
 import "firebase/firestore";
 import { useIfSingIn } from "./authHook";
 import { useGetMount } from "./controlComponent";
+import addMessage from "../components/combo/message/Message";
 
 export interface Member {
     id: string;
@@ -156,11 +157,13 @@ const sortListsByNextId = (
                             existListId,
                             tempSortLists
                         );
+                        addMessage("出現異常 請重新整理頁面", "Fail");
                         break;
                     }
                 } else {
                     nextList.nextListId = "";
                     console.log("sortListsByNextId ERROR #2");
+                    addMessage("出現異常 請重新整理頁面", "Fail");
                     break;
                     // throw "sortListsByNextId ERROR";
                 }
@@ -248,11 +251,13 @@ const sortCardsByNextId = (
                         } else {
                             nextListCard.nextCardId = "";
                             console.log("sortCardsByNextId ERROR #1");
+                            addMessage("出現異常 請重新整理頁面", "Fail");
                             break;
                         }
                     } else {
                         nextListCard.nextCardId = "";
                         console.log("sortCardsByNextId ERROR #2");
+                        addMessage("出現異常 請重新整理頁面", "Fail");
                         break;
                         // throw "sortCardsByNextId ERROR #2";
                     }
@@ -361,7 +366,7 @@ export const useSubListCardDatas = (): ListCardDatasCollection | null => {
     const refIsMount = useGetMount();
     const refSubLists = useRef<undefined | (() => void)>(undefined);
     const refSubCards = useRef<undefined | (() => void)>(undefined);
-    const refTimerRefreshListCardDatas = useRef<number>(-2);
+    const refTimerRefreshListCardDatas = useRef<number>(-3);
 
     const [lists, setLists] = useState<List[]>([]);
     const [cards, setCards] = useState<Card[]>([]);
@@ -443,24 +448,26 @@ export const useSubListCardDatas = (): ListCardDatasCollection | null => {
             sortListsByNextId(tempListCardDatas, lists);
             sortCardsByNextId(tempListCardDatas, cards);
 
+            // console.log("refTimerRefreshListCardDatas ###");
             if (refIsMount.current) {
-                if (refTimerRefreshListCardDatas.current === -2) {
+                if (refTimerRefreshListCardDatas.current < 0) {
+                    // console.log(
+                    //     "refTimerRefreshListCardDatas.current < 0",
+                    //     refTimerRefreshListCardDatas.current
+                    // );
                     setListCardDatas({
                         cards: cards,
                         lists: lists,
                         listCardDatas: tempListCardDatas,
                     });
 
-                    refTimerRefreshListCardDatas.current = -1;
-                } else if (refTimerRefreshListCardDatas.current === -1) {
-                    setListCardDatas({
-                        cards: cards,
-                        lists: lists,
-                        listCardDatas: tempListCardDatas,
-                    });
-
-                    refTimerRefreshListCardDatas.current = 0;
+                    refTimerRefreshListCardDatas.current =
+                        refTimerRefreshListCardDatas.current + 1;
                 } else {
+                    // console.log(
+                    //     "refTimerRefreshListCardDatas.current >= 0",
+                    //     refTimerRefreshListCardDatas.current
+                    // );
                     clearTimeout(refTimerRefreshListCardDatas.current);
                     refTimerRefreshListCardDatas.current = window.setTimeout(
                         () => {
@@ -481,7 +488,6 @@ export const useSubListCardDatas = (): ListCardDatasCollection | null => {
         return () => {
             if (refTimerRefreshListCardDatas.current > 0) {
                 clearTimeout(refTimerRefreshListCardDatas.current);
-                refTimerRefreshListCardDatas.current = -2;
             }
         };
     }, [lists, cards]);
@@ -514,7 +520,7 @@ export const useSubMessageContent = (messageId: string): MessageContent[] => {
         []
     );
     const memberList = useSubMemberList();
-    console.log("memberList", memberList);
+    // console.log("memberList", memberList);
 
     useIfSingIn(
         () => {
