@@ -362,7 +362,7 @@ const Table = (): JSX.Element | null => {
                                         handleAddCardMember={
                                             handleAddCardMember
                                         }
-                                        handleRemoCardveMember={
+                                        handleRemoveCardMember={
                                             handleRemoCardveMember
                                         }
                                     />

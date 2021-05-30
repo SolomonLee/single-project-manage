@@ -18,7 +18,7 @@ interface DndListBoxContentProps {
         memberName: string
     ) => void;
     /** 移除 Card member 使用 */
-    remoCardveMember: (cardId: string, memberId: string) => void;
+    removeCardMember: (cardId: string, memberId: string) => void;
 }
 const DndListBoxContent = ({
     cards,
@@ -26,7 +26,7 @@ const DndListBoxContent = ({
     handleRemoveThisCard,
     updateCard,
     addCardMember,
-    remoCardveMember,
+    removeCardMember,
 }: DndListBoxContentProps): JSX.Element => {
     return (
         <Droppable droppableId={listId} type="CARD">
@@ -44,7 +44,7 @@ const DndListBoxContent = ({
                                 handleRemoveThisCard={handleRemoveThisCard}
                                 updateCard={updateCard}
                                 addCardMember={addCardMember}
-                                remoCardveMember={remoCardveMember}
+                                removeCardMember={removeCardMember}
                             />
                         ))
                     ) : (

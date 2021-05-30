@@ -27,7 +27,7 @@ interface Props {
         memberName: string
     ) => void;
     /** 移除 Card member 使用 */
-    handleRemoCardveMember: (cardId: string, memberId: string) => void;
+    handleRemoveCardMember: (cardId: string, memberId: string) => void;
 }
 const DndList = ({
     listCardDatas,
@@ -35,9 +35,9 @@ const DndList = ({
     handleRemoveCard,
     handleRemoveList,
     handleUpdateList,
-    handleUpdateCard: handleupdateCard,
-    handleAddCardMember: handleaddCardMember,
-    handleRemoCardveMember: handleremoCardveMember,
+    handleUpdateCard,
+    handleAddCardMember,
+    handleRemoveCardMember,
 }: Props): JSX.Element => {
     // console.log("listCardDatas.list.index", listCardDatas.list.index);
     const [openFunctions, setOpenFunctions] = useState(false);
@@ -119,9 +119,9 @@ const DndList = ({
                         cards={listCardDatas.cards}
                         listId={listCardDatas.list.listId}
                         handleRemoveThisCard={handleRemoveThisCard}
-                        updateCard={handleupdateCard}
-                        addCardMember={handleaddCardMember}
-                        remoCardveMember={handleremoCardveMember}
+                        updateCard={handleUpdateCard}
+                        addCardMember={handleAddCardMember}
+                        removeCardMember={handleRemoveCardMember}
                     />
                 </div>
             )}

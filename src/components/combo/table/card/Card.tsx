@@ -14,14 +14,14 @@ export interface Props {
         memberId: string,
         memberName: string
     ) => void;
-    remoCardveMember: (cardId: string, memberId: string) => void;
+    removeCardMember: (cardId: string, memberId: string) => void;
 }
 const DndCard = ({
     card: data,
     handleRemoveThisCard,
     updateCard,
     addCardMember,
-    remoCardveMember,
+    removeCardMember,
 }: Props): JSX.Element => {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -46,7 +46,7 @@ const DndCard = ({
     };
 
     const handleRemoveMember = (memberId: string) => {
-        remoCardveMember(data.cardId, memberId);
+        removeCardMember(data.cardId, memberId);
     };
 
     return (
