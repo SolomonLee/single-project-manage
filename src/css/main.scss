@@ -184,6 +184,68 @@ footer {
         }
     }
 } // form_box
+
+.info_box {
+    padding-left: 32px;
+
+    > .box_title {
+        display: flex;
+        font-size: 20px;
+        font-weight: bold;
+        align-items: center;
+
+        .name {
+            flex: 1;
+            display: inline-block;
+            height: 38px;
+            line-height: 38px;
+            padding-left: 14px;
+            letter-spacing: 0.6px;
+            text-align: left;
+        }
+
+        .form-control {
+            font-size: 20px;
+            font-weight: bold;
+            line-height: 22px;
+            height: 38px;
+            letter-spacing: 0.6px;
+        }
+
+        .icon {
+            margin-left: -32px;
+            i.bi {
+                &::before {
+                    font-size: 24px;
+                    line-height: 32px;
+                }
+            }
+        }
+    }
+
+    sub {
+        color: #5e6c84;
+        vertical-align: top;
+    }
+
+    .form-control {
+        + .functions {
+            padding-top: 10px;
+        }
+    }
+} // info_box
+
+.card_message_box {
+    .card_message_item_group {
+        max-height: 50vh;
+        overflow: auto;
+        padding-left: 40px;
+        margin-left: -40px;
+        padding-top: 5px;
+        width: calc(100% + 40px);
+    }
+} // card_message_box
+
 // ===== BOX : END =====
 
 // ===== ITEM : START =====
@@ -376,4 +438,83 @@ footer {
     }
 } // split_item
 
+.card_message_item {
+    display: flex;
+    align-items: flex-start;
+    line-height: 32px;
+    margin-bottom: 14px;
+
+    & > .item_title {
+        padding: 0;
+        margin-left: -35px;
+        margin-right: 18px;
+    }
+
+    & > .item_content {
+        flex: 1;
+
+        > sub {
+            line-height: 18px;
+            display: inline-block;
+            position: absolute;
+            top: -6px;
+            height: 18px;
+            display: flex;
+            overflow: hidden;
+            max-width: 100%;
+
+            > span {
+                flex: 3;
+                overflow: hidden;
+
+                & + small {
+                    margin-left: 10px;
+                }
+            }
+
+            > small {
+                flex: 1;
+            }
+
+            & + .form-control {
+                margin-top: 16px;
+                padding: 5px 12px;
+            }
+        }
+
+        > p {
+            margin-top: 16px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 2px 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            display: inline-block;
+            margin-bottom: 8px;
+
+            & + .functions {
+                margin-top: 2px;
+            }
+        }
+
+        > .form-control {
+            position: relative;
+            z-index: 2;
+
+            + .functions {
+                margin-bottom: 10px;
+                margin-top: -48px;
+                position: relative;
+                z-index: 1;
+
+                transition: margin-top 0.15s ease-in-out;
+
+                &[data-show] {
+                    margin-top: 0;
+                }
+            }
+        }
+    }
+} // card_message_item
 // ===== ITEM : END =====

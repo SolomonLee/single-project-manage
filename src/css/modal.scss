@@ -14,6 +14,7 @@ body.modal-open {
     bottom: 0;
     display: none;
     z-index: 1;
+    overflow: auto;
 }
 
 .modal-mask {
@@ -44,5 +45,15 @@ body.modal-open {
         position: absolute;
         right: 20px;
         top: 18px;
+        color: #fff;
+    }
+
+    &[data-style="1"] {
+        .close {
+            color: #000;
+        }
+
+        background: #f4f5f7;
+        color: #000;
     }
 }

@@ -7,13 +7,15 @@
     align-items: flex-start;
     flex-direction: column;
 
-    & > .bolck_title {
+    & > .block_title {
         margin-bottom: 20px;
     }
 
     & > .block_content {
         display: flex;
         align-items: flex-start;
+        overflow: auto;
+        width: 100%;
     }
 
     .dnd_list_box {
@@ -21,6 +23,7 @@
         background-color: #ebecf0;
         border-radius: 3px;
         padding-bottom: 20px;
+        min-width: 290px;
 
         & + .dnd_list_box {
             margin-left: 20px;
@@ -85,7 +88,6 @@
 
         .dnd_card {
             display: flex;
-            padding: 4px 8px;
             background-color: #fff;
             box-shadow: 0 1px 0 #091e4240;
             margin-bottom: 8px;
@@ -93,19 +95,26 @@
             width: 250px;
 
             > .name {
-                flex: 1;
+                flex: 1 1;
                 line-height: 28px;
                 overflow: hidden;
+                padding: 4px 10px;
+                text-align: left;
+                font-size: 14px;
             }
 
             > .functions {
                 display: none;
 
                 .btn-sm {
-                    line-height: 26px;
+                    line-height: 18px;
                     padding: 0;
                     width: 28px;
                     vertical-align: top;
+                    padding: 4px 8px;
+                    margin-top: 4px;
+                    margin-bottom: 4px;
+                    margin-right: 4px;
                 }
             }
 
@@ -125,6 +134,83 @@
 
         .functions {
             text-align: right;
+        }
+    }
+}
+
+.card_member_list {
+    .card_member {
+        display: inline-block;
+        background-color: #dfe1e6;
+        border-radius: 30px;
+        width: 32px;
+        height: 32px;
+        text-align: center;
+        line-height: 32px;
+        overflow: hidden;
+        cursor: pointer;
+
+        & + .card_member {
+            margin-left: 10px;
+        }
+
+        & + .add_card_member {
+            margin-left: 10px;
+        }
+
+        > .user {
+            &::after {
+                content: "X";
+                opacity: 0;
+                position: absolute;
+                color: #fff;
+                background: #ff000030;
+                width: 100%;
+                left: 0;
+            }
+
+            &:hover {
+                .name {
+                    opacity: 0;
+                }
+
+                &::after {
+                    opacity: 1;
+                }
+            }
+        }
+    }
+
+    .add_card_member {
+        border-radius: 30px;
+        position: relative;
+
+        // &:hover {
+        //     .card_member {
+        //         background-color: #d1d4dc;
+        //         color: #000;
+
+        //         &::after {
+        //             display: none;
+        //         }
+        //     }
+        // }
+
+        .add_card_member_list {
+            background: #ffffffe3;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: absolute;
+            z-index: 1;
+
+            .btn {
+                flex: 1 1;
+                width: 100%;
+                text-align: left;
+            }
         }
     }
 }
