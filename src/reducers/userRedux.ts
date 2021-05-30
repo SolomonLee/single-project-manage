@@ -1,20 +1,25 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import * as apiAuth from "../apis/auth";
 import * as apiUser from "../apis/user";
-import { resultError /* , resultOk */ } from "../apis/result";
+import { resultError, resultOk } from "../apis/result";
 import addMessage from "../components/combo/message/Message";
 import { RootState } from "./store";
 
 interface UserState extends apiUser.User {
     inSignIn: boolean;
+    uid: string;
 }
 
 const initialState = <UserState>{
     inSignIn: false,
     email: "",
     userName: "",
+    uid: "",
 };
 
+interface UserAuth extends apiUser.User {
+    uid: string;
+}
 export const signInAsync = createAsyncThunk(
     "userRedux/signInAsync",
     async ({ email, password }: apiUser.Verification) => {
@@ -22,10 +27,14 @@ export const signInAsync = createAsyncThunk(
 
         if (resultSignIn.result) {
             const resultGetUserInfo = await apiUser.getUserInfo();
-            return resultGetUserInfo;
+
+            return resultOk(<UserAuth>{
+                ...resultGetUserInfo.datas,
+                uid: resultSignIn.datas,
+            });
         }
 
-        return resultError("登入失敗", <apiUser.User>{});
+        return resultError("登入失敗", <UserAuth>{});
     }
 ); // signInAsync()
 
@@ -49,7 +58,11 @@ export const getUserInfoAsync = createAsyncThunk(
     "gamerRedux/getGamerInfoAsync",
     async () => {
         const resultGetUserInfo = await apiUser.getUserInfo();
-        return resultGetUserInfo;
+
+        return resultOk(<UserAuth>{
+            ...resultGetUserInfo.datas,
+            uid: apiAuth.getUid(),
+        });
     }
 ); // getUserInfoAsync()
 
@@ -61,6 +74,7 @@ export const userSlice = createSlice({
             apiAuth.signOut();
             state.email = initialState.email;
             state.userName = initialState.userName;
+            state.uid = initialState.uid;
             addMessage("登出成功!", "Ok");
         },
     },
@@ -79,6 +93,7 @@ export const userSlice = createSlice({
 
                 state.email = user.email;
                 state.userName = user.userName;
+                state.uid = user.uid;
                 addMessage("登入成功!", "Ok");
             } else {
                 addMessage(action.payload.resultMsg, "Fail");
@@ -122,6 +137,7 @@ export const userSlice = createSlice({
                 const user = action.payload.datas;
                 state.email = user.email;
                 state.userName = user.userName;
+                state.uid = user.uid;
                 addMessage("自動登入成功!", "Ok");
             }
         });

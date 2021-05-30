@@ -5,12 +5,12 @@ import "firebase/auth";
 export const signIn = async (
     email: string,
     password: string
-): Promise<Result<null>> => {
+): Promise<Result<string>> => {
     try {
         const result = await firebase
             .auth()
             .signInWithEmailAndPassword(email, password);
-        if (result.user) return resultOk(null);
+        if (result.user) return resultOk(result.user.uid);
     } catch (e) {
         console.log(`signIn error!! ${e}`);
     }
@@ -77,4 +77,11 @@ export const addAuthStateChangedCallBack = (
 
 export const removeAuthStateChangedCallBack = (key: string): void => {
     mapAuthChangedCBL.delete(key);
+};
+
+export const getUid = (): string => {
+    const currentUser = firebase.auth().currentUser;
+    if (currentUser === null) return "";
+
+    return currentUser.uid;
 };
