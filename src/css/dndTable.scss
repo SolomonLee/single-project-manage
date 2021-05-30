@@ -108,6 +108,10 @@
                 padding: 4px 10px;
                 text-align: left;
                 font-size: 14px;
+
+                i {
+                    color: #999;
+                }
             }
 
             > .functions {
@@ -115,10 +119,9 @@
 
                 .btn-sm {
                     line-height: 18px;
-                    padding: 0;
                     width: 28px;
                     vertical-align: top;
-                    padding: 4px 8px;
+                    padding: 4px 0;
                     margin-top: 4px;
                     margin-bottom: 4px;
                     margin-right: 4px;

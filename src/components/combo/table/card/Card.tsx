@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Draggable } from "react-beautiful-dnd";
+import { useSelector } from "react-redux";
 import { UpdateCardData } from "../../../../apis/table";
 import { Card } from "../../../../hooks/autoSubscribe";
+import { selectUserUid } from "../../../../reducers/userRedux";
 import Modal from "../../modal/Modal";
 import CardEditForm from "./CardEditForm";
 
@@ -26,6 +28,7 @@ const DndCard = ({
     removeCardMember,
 }: Props): JSX.Element => {
     const [isOpen, setIsOpen] = useState(false);
+    const userUid = useSelector(selectUserUid);
 
     const handleRemoveCard = () => {
         handleRemoveThisCard(data);
@@ -50,6 +53,18 @@ const DndCard = ({
     const handleRemoveMember = (memberId: string) => {
         removeCardMember(data.cardId, memberId);
     };
+
+    const nameJSX = (
+        <div className="name" onClick={handleOpen}>
+            <div>{data.name}</div>
+            <div>
+                {data.members.findIndex((member) => member.uid === userUid) ===
+                -1 ? null : (
+                    <i className="bi bi-eye"></i>
+                )}
+            </div>
+        </div>
+    );
 
     return (
         <>
@@ -82,9 +97,7 @@ const DndCard = ({
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                     >
-                        <div className="name" onClick={handleOpen}>
-                            {data.name}
-                        </div>
+                        {nameJSX}
                         <div className="functions">
                             <button
                                 type="button"
