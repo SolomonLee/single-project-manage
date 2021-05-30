@@ -60,7 +60,7 @@ const AddListBox = ({
                             新增列表
                         </button>
                         <button
-                            className="btn btn_style1 btn-sm"
+                            className="btn btn_style2 btn-sm"
                             onClick={handleOpen}
                         >
                             <i className="bi bi-x"></i>

@@ -135,6 +135,19 @@ footer {
             background-color: $subColor3;
         }
     }
+
+    &.btn_style2 {
+        &:hover {
+            background-color: #091e4214;
+        }
+    }
+
+    &.btn_style3 {
+        color: #ff0a0a;
+        &:hover {
+            background-color: #ff000030;
+        }
+    }
 }
 // ===== ELEMENT : END =====
 

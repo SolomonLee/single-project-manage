@@ -8,6 +8,8 @@ import {
 import {
     createCard,
     createList,
+    removeCard,
+    removeList,
     updateBatchCard,
     updateBatchList,
     // UpdateCardData,
@@ -19,6 +21,7 @@ import {
     resortListCards,
     Card,
     List,
+    ListCardDatas,
 } from "../../../hooks/autoSubscribe";
 import AddListBox from "./list/AddListBox";
 import DndList from "./list/List";
@@ -94,6 +97,22 @@ const Table = (): JSX.Element | null => {
         }
     };
 
+    const handleRemoveCard = (listCardData: ListCardDatas, card: Card) => {
+        if (listCardDatasCol === null) return;
+
+        listCardDatasCol.listCardDatas[listCardData.list.index].cards.splice(
+            card.index,
+            1
+        );
+
+        removeCard(card.prevCardId, card.cardId, card.nextCardId);
+        resortListCards(
+            listCardDatasCol.listCardDatas[listCardData.list.index],
+            null
+        );
+        setListCardDatasCol({ ...listCardDatasCol });
+    };
+
     const handleCreateList = (name: string, nextListId: string) => {
         if (listCardDatasCol === null) {
             return;
@@ -127,6 +146,23 @@ const Table = (): JSX.Element | null => {
             console.log("updateLists", updateLists);
             updateBatchList(updateLists);
         }
+    };
+
+    const handleRemoveList = (listCardData: ListCardDatas) => {
+        if (listCardDatasCol === null) return;
+
+        listCardDatasCol.listCardDatas.splice(listCardData.list.index, 1)[0];
+        const cardIds = listCardData.cards.map((card) => card.cardId);
+
+        removeList(
+            listCardData.list.prevListId,
+            listCardData.list.listId,
+            listCardData.list.nextListId,
+            cardIds
+        );
+
+        resortListCardDatasByListCardDatas(listCardDatasCol);
+        setListCardDatasCol({ ...listCardDatasCol });
     };
 
     const onDragEnd = (
@@ -223,23 +259,31 @@ const Table = (): JSX.Element | null => {
                         ref={provided.innerRef}
                         {...provided.droppableProps}
                     >
-                        <AddListBox
-                            nextListId={
-                                listCardDatasCol.listCardDatas.length > 0
-                                    ? listCardDatasCol.listCardDatas[0].list
-                                          .listId
-                                    : ""
-                            }
-                            handleCreateList={handleCreateList}
-                        />
-                        {listCardDatasCol.listCardDatas.map((listCardData) => (
-                            <DndList
-                                key={listCardData.list.listId}
-                                listCardDatas={listCardData}
-                                handleCreateCard={handleCreateCard}
+                        <div className="block_title">
+                            <AddListBox
+                                nextListId={
+                                    listCardDatasCol.listCardDatas.length > 0
+                                        ? listCardDatasCol.listCardDatas[0].list
+                                              .listId
+                                        : ""
+                                }
+                                handleCreateList={handleCreateList}
                             />
-                        ))}
-                        {provided.placeholder}
+                        </div>
+                        <div className="block_content">
+                            {listCardDatasCol.listCardDatas.map(
+                                (listCardData) => (
+                                    <DndList
+                                        key={listCardData.list.listId}
+                                        listCardDatas={listCardData}
+                                        handleCreateCard={handleCreateCard}
+                                        handleRemoveList={handleRemoveList}
+                                        handleRemoveCard={handleRemoveCard}
+                                    />
+                                )
+                            )}
+                            {provided.placeholder}
+                        </div>
                     </div>
                 )}
             </Droppable>

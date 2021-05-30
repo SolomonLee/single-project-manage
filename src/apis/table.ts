@@ -65,7 +65,8 @@ export const updateBatchList = async (
 export const removeList = async (
     prevListId: string,
     removeListId: string,
-    nextListId: string
+    nextListId: string,
+    cardIds: string[]
 ): Promise<Result<null>> => {
     try {
         firebase
@@ -74,6 +75,7 @@ export const removeList = async (
                 prevListId,
                 removeListId,
                 nextListId,
+                cardIds,
             })
             .then((result) => {
                 if (!result.data.result) {

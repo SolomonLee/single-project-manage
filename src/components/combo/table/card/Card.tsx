@@ -4,8 +4,13 @@ import { Card } from "../../../../hooks/autoSubscribe";
 
 export interface Props {
     card: Card;
+    handleRemoveThisCard: (card: Card) => void;
 }
-const DndCard = ({ card: data }: Props): JSX.Element => {
+const DndCard = ({ card: data, handleRemoveThisCard }: Props): JSX.Element => {
+    const handleRemoveCard = () => {
+        handleRemoveThisCard(data);
+    };
+
     return (
         <Draggable
             key={data.cardId}
@@ -21,7 +26,15 @@ const DndCard = ({ card: data }: Props): JSX.Element => {
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                 >
-                    {data.name}
+                    <div className="name">{data.name}</div>
+                    <div className="functions">
+                        <button className="btn btn_style3 btn-sm">
+                            <i
+                                className="bi bi-x"
+                                onClick={handleRemoveCard}
+                            ></i>
+                        </button>
+                    </div>
                 </div>
             )}
         </Draggable>

@@ -1,26 +1,128 @@
 .dnd_table_block {
     border: 1px solid #7fb3d1;
     padding: 20px;
+    margin: 0 20px;
     border-radius: 8px;
     display: flex;
     align-items: flex-start;
+    flex-direction: column;
+
+    & > .bolck_title {
+        margin-bottom: 20px;
+    }
+
+    & > .block_content {
+        display: flex;
+        align-items: flex-start;
+    }
 
     .dnd_list_box {
         display: inline-block;
         background-color: #ebecf0;
-        padding: 20px;
         border-radius: 3px;
+        padding-bottom: 20px;
 
         & + .dnd_list_box {
             margin-left: 20px;
         }
 
+        > .box_title {
+            display: flex;
+            padding-top: 0;
+            position: relative;
+            padding-bottom: 8px;
+
+            > .drag_title {
+                flex: 1;
+                height: 40px;
+                text-align: left;
+                padding: 12px 20px;
+
+                > .name {
+                    font-size: 20px;
+                    line-height: 24px;
+                    padding: 0;
+                    vertical-align: top;
+                }
+            }
+
+            > .functions {
+                display: flex;
+                position: absolute;
+                right: -76px;
+                background: #fff;
+                top: 40px;
+                z-index: 1;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                padding: 10px;
+
+                .btn {
+                    vertical-align: top;
+                }
+            }
+        }
+
+        > .box_content {
+            padding: 0 20px;
+        }
+
+        > .dnd_card_add_box {
+            padding: 12px 20px;
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+            text-align: left;
+
+            .fill_item {
+                margin-bottom: 4px;
+            }
+
+            .functions[data-open] {
+                text-align: right;
+            }
+        }
+
         .dnd_card {
-            padding: 12px 8px;
+            display: flex;
+            padding: 4px 8px;
             background-color: #fff;
             box-shadow: 0 1px 0 #091e4240;
             margin-bottom: 8px;
             border-radius: 3px;
+            width: 250px;
+
+            > .name {
+                flex: 1;
+                line-height: 28px;
+            }
+
+            > .functions {
+                display: none;
+
+                .btn-sm {
+                    line-height: 26px;
+                    padding: 0;
+                    width: 28px;
+                    vertical-align: top;
+                }
+            }
+
+            &:hover {
+                > .functions {
+                    display: block;
+                }
+            }
+        }
+    }
+
+    .dnd_list_add_box {
+        margin-right: 20px;
+        background-color: #ebecf0;
+        padding: 20px;
+        border-radius: 4px;
+
+        .functions {
+            text-align: right;
         }
     }
 }
