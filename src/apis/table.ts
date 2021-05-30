@@ -286,6 +286,7 @@ export const removeCard = async (
 
 export const createMessage = async (
     messageId: string,
+    contentId: string,
     content: string
 ): Promise<Result<null>> => {
     try {
@@ -293,6 +294,7 @@ export const createMessage = async (
             .functions()
             .httpsCallable("createMessage")({
                 messageId,
+                contentId,
                 content,
             })
             .then((result) => {
