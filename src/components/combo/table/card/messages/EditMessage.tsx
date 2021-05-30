@@ -6,13 +6,13 @@ interface Props {
     contentId: string;
     content: string;
     name: string;
-    timestamp: number;
+    timeStr: string;
 }
 const EditMessage = ({
     removeContent,
     updateContent,
     contentId,
-    timestamp,
+    timeStr,
     content,
     name,
 }: Props): JSX.Element => {
@@ -112,7 +112,7 @@ const EditMessage = ({
             <div className="item_content">
                 <sub>
                     <span>{name}</span>
-                    <small>{timestamp}</small>
+                    <small>{timeStr}</small>
                 </sub>
                 {contentJSX}
             </div>

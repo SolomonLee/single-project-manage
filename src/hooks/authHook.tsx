@@ -29,7 +29,7 @@ export const useIfSingIn = (
     const userEmail = useSelector(selectUserEmail);
 
     useEffect(() => {
-        if (userEmail.length) {
+        if (typeof userEmail === "string" && userEmail.length) {
             isSingInCB();
         } else {
             notSingInCB();

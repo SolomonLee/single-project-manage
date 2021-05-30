@@ -7,6 +7,7 @@ import EditCardMember from "./EditCardMember";
 import CardMessageBox from "./messages/CardMessageBox";
 
 interface Props {
+    listName: string;
     card: Card;
     updateCard: (updateCardData: UpdateCardData) => void;
     removeCard: () => void;
@@ -15,6 +16,7 @@ interface Props {
 }
 
 const CardEditForm = ({
+    listName,
     card,
     updateCard,
     removeCard,
@@ -47,7 +49,7 @@ const CardEditForm = ({
                         />
                     </div>
                     <div className="box_content">
-                        <sub>在「{card.listId}」列表中</sub>
+                        <sub>在「{listName}」列表中</sub>
                     </div>
                 </div>
                 <div className="info_box">

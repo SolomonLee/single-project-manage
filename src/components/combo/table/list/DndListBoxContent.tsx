@@ -5,6 +5,7 @@ import { Card } from "../../../../hooks/autoSubscribe";
 import DndCard from "../card/Card";
 
 interface DndListBoxContentProps {
+    listName: string;
     listId: string;
     cards: Card[];
     handleRemoveThisCard: (card: Card) => void;
@@ -21,6 +22,7 @@ interface DndListBoxContentProps {
     removeCardMember: (cardId: string, memberId: string) => void;
 }
 const DndListBoxContent = ({
+    listName,
     cards,
     listId,
     handleRemoveThisCard,
@@ -39,6 +41,7 @@ const DndListBoxContent = ({
                     {cards.length > 0 ? (
                         cards.map((card) => (
                             <DndCard
+                                listName={listName}
                                 key={card.cardId}
                                 card={card}
                                 handleRemoveThisCard={handleRemoveThisCard}

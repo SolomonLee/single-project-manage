@@ -6,6 +6,7 @@ import Modal from "../../modal/Modal";
 import CardEditForm from "./CardEditForm";
 
 export interface Props {
+    listName: string;
     card: Card;
     handleRemoveThisCard: (card: Card) => void;
     updateCard: (card: UpdateCardData) => void;
@@ -17,6 +18,7 @@ export interface Props {
     removeCardMember: (cardId: string, memberId: string) => void;
 }
 const DndCard = ({
+    listName,
     card: data,
     handleRemoveThisCard,
     updateCard,
@@ -58,6 +60,7 @@ const DndCard = ({
                 className="modal_lg"
             >
                 <CardEditForm
+                    listName={listName}
                     card={data}
                     updateCard={handleUpdateCard}
                     removeCard={handleRemoveCard}

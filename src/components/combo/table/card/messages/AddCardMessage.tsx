@@ -40,6 +40,7 @@ const AddCardMessage = ({ name, addContent }: Props): JSX.Element => {
                     onChange={handleChange}
                     className="form-control"
                     onKeyPress={handleKeyPress}
+                    placeholder="留下一些訊息吧"
                 />
 
                 <div

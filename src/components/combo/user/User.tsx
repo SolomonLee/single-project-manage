@@ -62,10 +62,9 @@ const User = (): JSX.Element => {
     let showJSX = null;
     if (inSignIn) {
         showJSX = (
-            <span>
-                <span className="material-icons icons-loading" />
-                確認中...
-            </span>
+            <Modal isOpen={true} stylenum={0} setClose={undefined}>
+                確認登入中
+            </Modal>
         );
     } else if (userEmail?.length) {
         showJSX = (
@@ -101,13 +100,15 @@ const User = (): JSX.Element => {
     return (
         <div className="user">
             {showJSX}
-            <Modal isOpen={isOpenSing} stylenum={0} setClose={undefined}>
-                <SignInForm
-                    singInFunction={handleSignIn}
-                    registerFunction={handleRegister}
-                    isWaitingResult={inSignIn}
-                />
-            </Modal>
+            {inSignIn ? null : (
+                <Modal isOpen={isOpenSing} stylenum={0} setClose={undefined}>
+                    <SignInForm
+                        singInFunction={handleSignIn}
+                        registerFunction={handleRegister}
+                        isWaitingResult={inSignIn}
+                    />
+                </Modal>
+            )}
         </div>
     );
 };

@@ -18,6 +18,39 @@ import AddCardMessage from "./AddCardMessage";
 import CardMessage from "./CardMessage";
 import EditMessage from "./EditMessage";
 
+const getTimeStr = (timestamp1: number, now: number) => {
+    let td = Math.floor((now - timestamp1) / 1000);
+
+    if (td < 60) {
+        return "剛剛";
+    } else {
+        td = Math.floor(td / 60);
+
+        if (td < 60) {
+            return `${td} 分鐘以前`;
+        } else {
+            td = Math.floor(td / 24);
+
+            if (td < 24) {
+                return `${td} 小時以前`;
+            } else {
+                td = Math.floor(td / 7);
+
+                if (td < 7) {
+                    return `${td} 天之前`;
+                }
+            }
+        }
+    }
+
+    const date = new Date(timestamp1);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+
+    return `${year}年 ${month}月 ${day}日`;
+};
+
 interface Props {
     messageId: string;
 }
@@ -30,7 +63,7 @@ const CardMessageBox = ({ messageId }: Props): JSX.Element => {
     /** 讓迅速更新時畫面不會一直閃爍 */
     const refTimerUpdateBatch = useRef<number | null>(null);
 
-    console.log("messageContents", messageContents);
+    // console.log("messageContents", messageContents);
     const userUid = useSelector(selectUserUid);
     const userName = useSelector(selectUserName);
 
@@ -116,13 +149,14 @@ const CardMessageBox = ({ messageId }: Props): JSX.Element => {
     };
 
     const messageContentJSX = useMemo(() => {
+        const now = Date.now();
         return messageContents.map((messageContent) => {
             if (userUid !== messageContent.uid) {
                 return (
                     <CardMessage
                         key={messageContent.contentId}
                         name={messageContent.userName}
-                        timestamp={messageContent.timestamp}
+                        timeStr={getTimeStr(messageContent.timestamp, now)}
                     >
                         {messageContent.content}
                     </CardMessage>
@@ -136,7 +170,7 @@ const CardMessageBox = ({ messageId }: Props): JSX.Element => {
                         removeContent={removeContent}
                         updateContent={editContent}
                         content={messageContent.content}
-                        timestamp={messageContent.timestamp}
+                        timeStr={getTimeStr(messageContent.timestamp, now)}
                     ></EditMessage>
                 );
             }

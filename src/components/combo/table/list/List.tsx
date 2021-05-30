@@ -117,6 +117,7 @@ const DndList = ({
                     />
 
                     <DndListBoxContent
+                        listName={listCardDatas.list.name}
                         cards={listCardDatas.cards}
                         listId={listCardDatas.list.listId}
                         handleRemoveThisCard={handleRemoveThisCard}

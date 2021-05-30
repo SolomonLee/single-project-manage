@@ -129,6 +129,7 @@ const sortListsByNextId = (
             }
 
             tempSortLists.push(list);
+            existListId.push(list.listId);
             let nextList = list;
             for (;;) {
                 if (nextList.nextListId === sortListFirstId) {
@@ -144,11 +145,24 @@ const sortListsByNextId = (
                 );
 
                 if (typeof findNextList !== "undefined") {
-                    existListId.push(findNextList.listId);
-                    tempSortLists.push(findNextList);
-                    nextList = findNextList;
+                    if (existListId.indexOf(findNextList.listId) === -1) {
+                        existListId.push(findNextList.listId);
+                        tempSortLists.push(findNextList);
+                        nextList = findNextList;
+                    } else {
+                        nextList.nextListId = "";
+                        console.log(
+                            "sortListsByNextId ERROR #1",
+                            existListId,
+                            tempSortLists
+                        );
+                        break;
+                    }
                 } else {
-                    throw "sortListsByNextId ERROR";
+                    nextList.nextListId = "";
+                    console.log("sortListsByNextId ERROR #2");
+                    break;
+                    // throw "sortListsByNextId ERROR";
                 }
             }
         }
@@ -204,8 +218,6 @@ const sortCardsByNextId = (
                 let nextListCard = fListCard;
                 // console.log("====================");
                 for (;;) {
-                    // console.log("==========");
-                    // console.log("fListCard before", JSON.stringify(fListCard));
                     if (
                         nextListCard.nextCardId === sortListCardsFirstId ||
                         nextListCard.nextCardId === ""
@@ -221,33 +233,28 @@ const sortCardsByNextId = (
                         break;
                     }
 
-                    // console.log(
-                    //     "fListCard find nextListCard.nextCardId",
-                    //     nextListCard.nextCardId,
-                    //     JSON.stringify(filterListCards)
-                    // );
                     const findNextListCard = filterListCards.find(
                         (fCard) => fCard.cardId === nextListCard.nextCardId
                     );
 
-                    // console.log(
-                    //     "fListCard after",
-                    //     JSON.stringify(findNextListCard)
-                    // );
-
                     if (typeof findNextListCard !== "undefined") {
                         if (
-                            existListCardId.indexOf(findNextListCard.cardId) !==
+                            existListCardId.indexOf(findNextListCard.cardId) ===
                             -1
                         ) {
-                            throw "sortCardsByNextId ERROR #1";
+                            existListCardId.push(findNextListCard.cardId);
+                            tempSortListCards.push(findNextListCard);
+                            nextListCard = findNextListCard;
+                        } else {
+                            nextListCard.nextCardId = "";
+                            console.log("sortCardsByNextId ERROR #1");
+                            break;
                         }
-
-                        existListCardId.push(findNextListCard.cardId);
-                        tempSortListCards.push(findNextListCard);
-                        nextListCard = findNextListCard;
                     } else {
-                        throw "sortCardsByNextId ERROR #2";
+                        nextListCard.nextCardId = "";
+                        console.log("sortCardsByNextId ERROR #2");
+                        break;
+                        // throw "sortCardsByNextId ERROR #2";
                     }
                     // console.log("==========");
                 }
@@ -295,11 +302,8 @@ export const resortListCardDatasByListCardDatas = (
         const lastIndex = listCardDatasCollection.listCardDatas.length - 1;
         listCardDatasCollection.listCardDatas[lastIndex].list.index = lastIndex;
         listCardDatasCollection.listCardDatas[lastIndex].list.nextListId = "";
-
         listCardDatasCollection.listCardDatas[lastIndex].list.prevListId =
-            listCardDatasCollection.listCardDatas[
-                listCardDatasCollection.listCardDatas.length - 2
-            ].list.listId;
+            listCardDatasCollection.listCardDatas[lastIndex - 1].list.listId;
     } else if (listCardDatasCollection.listCardDatas.length === 1) {
         listCardDatasCollection.listCardDatas[0].list.index = 0;
         listCardDatasCollection.listCardDatas[0].list.nextListId = "";
@@ -357,6 +361,7 @@ export const useSubListCardDatas = (): ListCardDatasCollection | null => {
     const refIsMount = useGetMount();
     const refSubLists = useRef<undefined | (() => void)>(undefined);
     const refSubCards = useRef<undefined | (() => void)>(undefined);
+    const refTimerRefreshListCardDatas = useRef<number>(-2);
 
     const [lists, setLists] = useState<List[]>([]);
     const [cards, setCards] = useState<Card[]>([]);
@@ -386,7 +391,7 @@ export const useSubListCardDatas = (): ListCardDatasCollection | null => {
                             }
                         });
 
-                        console.log("tempLists2", tempLists);
+                        // console.log("tempLists2", tempLists);
                         setLists(tempLists);
                     });
 
@@ -414,7 +419,7 @@ export const useSubListCardDatas = (): ListCardDatasCollection | null => {
                             }
                         });
 
-                        console.log("tempCards", tempCards);
+                        // console.log("tempCards", tempCards);
                         setCards(tempCards);
                     });
             });
@@ -437,14 +442,48 @@ export const useSubListCardDatas = (): ListCardDatasCollection | null => {
             const tempListCardDatas = [] as ListCardDatas[];
             sortListsByNextId(tempListCardDatas, lists);
             sortCardsByNextId(tempListCardDatas, cards);
-            setListCardDatas({
-                cards: cards,
-                lists: lists,
-                listCardDatas: tempListCardDatas,
-            });
+
+            if (refIsMount.current) {
+                if (refTimerRefreshListCardDatas.current === -2) {
+                    setListCardDatas({
+                        cards: cards,
+                        lists: lists,
+                        listCardDatas: tempListCardDatas,
+                    });
+
+                    refTimerRefreshListCardDatas.current = -1;
+                } else if (refTimerRefreshListCardDatas.current === -1) {
+                    setListCardDatas({
+                        cards: cards,
+                        lists: lists,
+                        listCardDatas: tempListCardDatas,
+                    });
+
+                    refTimerRefreshListCardDatas.current = 0;
+                } else {
+                    clearTimeout(refTimerRefreshListCardDatas.current);
+                    refTimerRefreshListCardDatas.current = window.setTimeout(
+                        () => {
+                            setListCardDatas({
+                                cards: cards,
+                                lists: lists,
+                                listCardDatas: tempListCardDatas,
+                            });
+                        },
+                        2000
+                    );
+                }
+            }
         } catch (error) {
             console.log(error);
         }
+
+        return () => {
+            if (refTimerRefreshListCardDatas.current > 0) {
+                clearTimeout(refTimerRefreshListCardDatas.current);
+                refTimerRefreshListCardDatas.current = -2;
+            }
+        };
     }, [lists, cards]);
 
     return listCardDatas;

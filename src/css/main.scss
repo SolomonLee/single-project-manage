@@ -169,9 +169,6 @@ footer {
     }
 }
 
-.member_list_box {
-} // member_list_box
-
 .form_box {
     & > .box_content {
         padding: 5px 0 20px;
@@ -411,7 +408,7 @@ footer {
     width: 100%;
     position: relative;
     text-align: center;
-    background: #fff;
+    background: transparent;
     margin-bottom: 20px;
     user-select: none;
 
@@ -452,6 +449,8 @@ footer {
 
     & > .item_content {
         flex: 1;
+        border-bottom: 1px solid #ccc;
+        padding-bottom: 6px;
 
         > sub {
             line-height: 18px;
@@ -464,16 +463,11 @@ footer {
             max-width: 100%;
 
             > span {
-                flex: 3;
                 overflow: hidden;
 
                 & + small {
                     margin-left: 10px;
                 }
-            }
-
-            > small {
-                flex: 1;
             }
 
             & + .form-control {

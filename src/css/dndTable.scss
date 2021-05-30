@@ -23,7 +23,7 @@
         background-color: #ebecf0;
         border-radius: 3px;
         padding-bottom: 20px;
-        min-width: 290px;
+        width: 290px;
 
         & + .dnd_list_box {
             margin-left: 20px;
@@ -45,6 +45,13 @@
                     font-size: 20px;
                     line-height: 24px;
                     padding: 0;
+                    vertical-align: top;
+                }
+
+                > .form-control {
+                    padding: 0 0 0 6px;
+                    font-size: 20px;
+                    line-height: 26px;
                     vertical-align: top;
                 }
             }

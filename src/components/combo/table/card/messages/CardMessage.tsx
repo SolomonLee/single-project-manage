@@ -3,9 +3,9 @@ import React from "react";
 interface Props {
     name: string;
     children: string;
-    timestamp: number;
+    timeStr: string;
 }
-const CardMessage = ({ name, children, timestamp }: Props): JSX.Element => {
+const CardMessage = ({ name, children, timeStr }: Props): JSX.Element => {
     return (
         <div className="card_message_item">
             <div className="item_title">
@@ -18,7 +18,7 @@ const CardMessage = ({ name, children, timestamp }: Props): JSX.Element => {
             <div className="item_content">
                 <sub>
                     <span>{name === "" ? "未知" : name}</span>
-                    <small>{timestamp}</small>
+                    <small>{timeStr}</small>
                 </sub>
                 <p>{children}</p>
             </div>
