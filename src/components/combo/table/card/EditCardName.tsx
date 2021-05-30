@@ -50,6 +50,7 @@ const EditCardName = ({ card, updateCardName }: Props): JSX.Element => {
 
                 <button
                     className="btn btn_style2 btn-sm"
+                    type="button"
                     onClick={handleIsEdit}
                 >
                     <i className="bi bi-x"></i>
@@ -61,7 +62,11 @@ const EditCardName = ({ card, updateCardName }: Props): JSX.Element => {
     return (
         <>
             <span className="name">{card.name}</span>
-            <button className="btn btn_style2 btn-sm" onClick={handleIsEdit}>
+            <button
+                type="button"
+                className="btn btn_style2 btn-sm"
+                onClick={handleIsEdit}
+            >
                 編輯
             </button>
         </>

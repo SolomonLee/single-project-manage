@@ -54,12 +54,14 @@ const AddListBox = ({
                 {isOpen ? (
                     <>
                         <button
+                            type="button"
                             className="btn btn_style1 btn-sm"
                             onClick={handleSubmit}
                         >
                             新增列表
                         </button>
                         <button
+                            type="button"
                             className="btn btn_style2 btn-sm"
                             onClick={handleOpen}
                         >
@@ -68,6 +70,7 @@ const AddListBox = ({
                     </>
                 ) : (
                     <button
+                        type="button"
                         className="btn btn_style1 btn-sm"
                         onClick={handleOpen}
                     >

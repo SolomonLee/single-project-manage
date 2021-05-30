@@ -17,12 +17,14 @@ const ListFunctions = ({
     return (
         <div className="functions">
             <button
+                type="button"
                 className="btn btn_style2 btn-sm"
                 onClick={handleIsEditListName}
             >
                 編輯名稱
             </button>
             <button
+                type="button"
                 className="btn btn_style3 btn-sm"
                 onClick={handleRemoveThisList}
             >

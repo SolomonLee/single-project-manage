@@ -39,12 +39,14 @@ const EditCardContent = ({ card, updateCardContent }: Props): JSX.Element => {
                 />
                 <div className="functions">
                     <button
+                        type="button"
                         className="btn btn_style1 btn-sm"
                         onClick={handleSaveEdit}
                     >
                         儲存
                     </button>
                     <button
+                        type="button"
                         className="btn btn_style2 btn-sm"
                         onClick={handleIsEdit}
                     >
@@ -60,7 +62,11 @@ const EditCardContent = ({ card, updateCardContent }: Props): JSX.Element => {
             <div className="card_content">
                 <ReactMarkdown>{card.content}</ReactMarkdown>
             </div>
-            <button className="btn btn_style1 btn-sm" onClick={handleIsEdit}>
+            <button
+                type="button"
+                className="btn btn_style1 btn-sm"
+                onClick={handleIsEdit}
+            >
                 編輯
             </button>
         </>

@@ -4,6 +4,7 @@ import { UpdateCardData } from "../../../../apis/table";
 import EditCardName from "./EditCardName";
 import EditCardContent from "./EditCardContent";
 import EditCardMember from "./EditCardMember";
+import CardMessageBox from "./messages/CardMessageBox";
 
 interface Props {
     card: Card;
@@ -28,8 +29,12 @@ const CardEditForm = ({
         });
     };
 
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+    };
+
     return (
-        <form className="form_box">
+        <form className="form_box" onSubmit={handleSubmit}>
             <div className="box_content">
                 <div className="info_box">
                     <div className="box_title">
@@ -46,10 +51,12 @@ const CardEditForm = ({
                     </div>
                 </div>
                 <div className="info_box">
-                    <div>
-                        <span>成員</span>
-                    </div>
                     <div className="box_content">
+                        {card.members.length > 0 ? (
+                            <div>
+                                <span>成員</span>
+                            </div>
+                        ) : null}
                         <EditCardMember
                             card={card}
                             addMember={addMember}
@@ -78,8 +85,8 @@ const CardEditForm = ({
                         </div>
                         <span className="name">活動</span>
                     </div>
-                    <div>
-                        <span>{card.messageId}</span>
+                    <div className="box_content">
+                        <CardMessageBox messageId={card.messageId} />
                     </div>
                 </div>
                 <div className="info_box">
@@ -91,6 +98,7 @@ const CardEditForm = ({
                     </div>
                     <div>
                         <button
+                            type="button"
                             className="btn btn_style3 btn-sm"
                             onClick={removeCard}
                         >

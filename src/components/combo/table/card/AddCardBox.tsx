@@ -59,12 +59,14 @@ const AddDndCardBox = ({
                 {isOpen ? (
                     <>
                         <button
+                            type="button"
                             className="btn btn_style1 btn-sm"
                             onClick={handleSubmit}
                         >
                             新增卡片
                         </button>
                         <button
+                            type="button"
                             className="btn btn_style2 btn-sm"
                             onClick={handleOpen}
                         >
@@ -73,6 +75,7 @@ const AddDndCardBox = ({
                     </>
                 ) : (
                     <button
+                        type="button"
                         className="btn btn_style1 btn-sm"
                         onClick={handleOpen}
                     >
