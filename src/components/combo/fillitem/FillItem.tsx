@@ -13,10 +13,11 @@ interface Props {
     error: string | null;
     placeholder: string | null;
     value: string | number;
-    name: string;
+    name?: string;
     type: string;
     onchange: (e: ChangeEvent<HTMLInputElement>) => void;
-    onblur: FocusEventHandler<HTMLInputElement> | undefined;
+    onblur?: FocusEventHandler<HTMLInputElement>;
+    onkeypress?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
 
 const FillItem: React.ForwardRefRenderFunction<FillHandle, Props> = (
@@ -28,7 +29,8 @@ const FillItem: React.ForwardRefRenderFunction<FillHandle, Props> = (
         name,
         type,
         onchange,
-        onblur = undefined,
+        onblur,
+        onkeypress,
     }: Props,
     forwardedRef
 ): JSX.Element => {
@@ -52,6 +54,11 @@ const FillItem: React.ForwardRefRenderFunction<FillHandle, Props> = (
             }
         },
     }));
+
+    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (typeof onkeypress !== "undefined") onkeypress(e);
+    };
+
     return (
         <div className="fill_item" data-error={error ? "" : null}>
             {title ? <div className="item_title">{title}</div> : null}
@@ -67,6 +74,7 @@ const FillItem: React.ForwardRefRenderFunction<FillHandle, Props> = (
                     onChange={onchange}
                     onBlur={onblur}
                     className="form-control"
+                    onKeyPress={handleKeyPress}
                 />
                 {error && error !== "" ? (
                     <div className="error">{error}</div>

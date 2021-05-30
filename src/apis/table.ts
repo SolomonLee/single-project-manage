@@ -124,7 +124,7 @@ export const createCard = async (
     return resultError("新增 Card 失敗", null);
 };
 
-export interface UpdateCardData {
+export interface UpdateBatchCardData {
     id: string;
     content: string;
     listId: string;
@@ -132,7 +132,7 @@ export interface UpdateCardData {
     nextCardId: string;
 }
 export const updateBatchCard = async (
-    arrList: UpdateCardData[]
+    arrList: UpdateBatchCardData[]
 ): Promise<Result<null>> => {
     try {
         firebase
@@ -156,24 +156,31 @@ export const updateBatchCard = async (
     return resultError("更新 Card 失敗", null);
 };
 
-interface CardMemberData {
-    /** card ID */
+export interface CardMemberData {
     memberName: string;
+    /** member ID */
     uid: string;
 }
-interface UpdateCardMemberData {
-    /** card ID */
+export interface UpdateCardData {
     id: string;
-    cardMemberDatas: CardMemberData[];
+    content: string;
+    name: string;
+    members: CardMemberData[];
 }
-export const updateCardMembers = async (
-    arrList: UpdateCardMemberData[]
-): Promise<Result<null>> => {
+export const updateCard = async ({
+    id,
+    content,
+    name,
+    members,
+}: UpdateCardData): Promise<Result<null>> => {
     try {
         firebase
             .functions()
-            .httpsCallable("updateCardMembers")({
-                arrList,
+            .httpsCallable("updateCard")({
+                id,
+                content,
+                name,
+                members,
             })
             .then((result) => {
                 if (!result.data.result) {

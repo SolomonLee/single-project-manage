@@ -49,7 +49,7 @@ const Modal = ({
                             className="close"
                             onClick={setClose}
                         >
-                            <span className="material-icons icons-close" />
+                            <i className="bi bi-x"></i>
                         </button>
                     ) : null}
 

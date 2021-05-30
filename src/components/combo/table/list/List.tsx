@@ -1,45 +1,10 @@
 import React, { useState } from "react";
-import { Droppable, Draggable } from "react-beautiful-dnd";
+import { Draggable } from "react-beautiful-dnd";
 import { Card, ListCardDatas } from "../../../../hooks/autoSubscribe";
-import addMessage from "../../message/Message";
 import AddDndCardBox from "../card/AddCardBox";
-import DndCard from "../card/Card";
-
-interface DndListBoxContentProps {
-    listId: string;
-    cards: Card[];
-    handleRemoveThisCard: (card: Card) => void;
-}
-const DndListBoxContent = ({
-    cards,
-    listId,
-    handleRemoveThisCard,
-}: DndListBoxContentProps): JSX.Element => {
-    return (
-        <Droppable droppableId={listId} type="CARD">
-            {(provided) => (
-                <div
-                    className="box_content"
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                >
-                    {cards.length > 0 ? (
-                        cards.map((card) => (
-                            <DndCard
-                                key={card.cardId}
-                                card={card}
-                                handleRemoveThisCard={handleRemoveThisCard}
-                            />
-                        ))
-                    ) : (
-                        <span>尚無卡片</span>
-                    )}
-                    {provided.placeholder}
-                </div>
-            )}
-        </Droppable>
-    );
-};
+import DndListBoxContent from "./DndListBoxContent";
+import EditListName from "./EditListName";
+import ListFunctions from "./ListFunctions";
 
 interface Props {
     listCardDatas: ListCardDatas;
@@ -62,7 +27,6 @@ const DndList = ({
     // console.log("listCardDatas.list.index", listCardDatas.list.index);
     const [openFunctions, setOpenFunctions] = useState(false);
     const [isEditListName, setIsEditListName] = useState(false);
-    const [editName, setEditName] = useState(listCardDatas.list.name);
 
     // 提供 CARD 使用
     const handleRemoveThisCard = (card: Card) => {
@@ -85,27 +49,8 @@ const DndList = ({
         setIsEditListName(!isEditListName);
     };
 
-    const handleEditListNameChange = (
-        e: React.ChangeEvent<HTMLInputElement>
-    ) => {
-        setEditName(e.target.value);
-    };
-
-    const handleEditListNameKeyPress = (
-        e: React.KeyboardEvent<HTMLInputElement>
-    ) => {
-        if (e.key === "Enter") {
-            if (editName.length === 0) {
-                addMessage("列表名稱不得為空");
-            }
-
-            if (editName !== listCardDatas.list.name) {
-                listCardDatas.list.name = editName;
-                handleUpdateList(listCardDatas);
-            }
-
-            handleIsEditListName();
-        }
+    const handleUpdateListName = () => {
+        handleUpdateList(listCardDatas);
     };
     // 提供 LIST 使用 : END
 
@@ -125,20 +70,12 @@ const DndList = ({
                             className="drag_title"
                             {...provided.dragHandleProps}
                         >
-                            {isEditListName ? (
-                                <input
-                                    name="EditListName"
-                                    type="text"
-                                    className="form-control"
-                                    value={editName}
-                                    onChange={handleEditListNameChange}
-                                    onKeyPress={handleEditListNameKeyPress}
-                                />
-                            ) : (
-                                <span className="name">
-                                    {listCardDatas.list.name}
-                                </span>
-                            )}
+                            <EditListName
+                                setIsEditListName={setIsEditListName}
+                                isEditListName={isEditListName}
+                                listCardDatas={listCardDatas}
+                                updateListName={handleUpdateListName}
+                            />
                         </div>
                         <button
                             className="btn btn_style2 btn-sm"
@@ -146,22 +83,11 @@ const DndList = ({
                         >
                             <i className="bi bi-three-dots"></i>
                         </button>
-                        {openFunctions ? (
-                            <div className="functions">
-                                <button
-                                    className="btn btn_style2 btn-sm"
-                                    onClick={handleIsEditListName}
-                                >
-                                    編輯名稱
-                                </button>
-                                <button
-                                    className="btn btn_style3 btn-sm"
-                                    onClick={handleRemoveThisList}
-                                >
-                                    移除列表
-                                </button>
-                            </div>
-                        ) : null}
+                        <ListFunctions
+                            isOpen={openFunctions}
+                            handleIsEditListName={handleIsEditListName}
+                            handleRemoveThisList={handleRemoveThisList}
+                        />
                     </div>
 
                     <AddDndCardBox
