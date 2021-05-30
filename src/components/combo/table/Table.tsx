@@ -6,12 +6,16 @@ import {
     /*ResponderProvided,*/
 } from "react-beautiful-dnd";
 import {
+    addCardMember,
     createCard,
     createList,
     removeCard,
+    removeCardMember,
     removeList,
     updateBatchCard,
     updateBatchList,
+    updateCard,
+    UpdateCardData,
     // UpdateCardData,
 } from "../../../apis/table";
 import {
@@ -110,6 +114,74 @@ const Table = (): JSX.Element | null => {
             listCardDatasCol.listCardDatas[listCardData.list.index],
             null
         );
+        setListCardDatasCol({ ...listCardDatasCol });
+    };
+
+    const handleEditCardNameContent = (card: UpdateCardData) => {
+        if (listCardDatasCol === null) {
+            return;
+        }
+
+        const sourceCard = listCardDatasCol.cards.find(
+            (_card) => _card.cardId === card.id
+        );
+        if (typeof sourceCard === "undefined") {
+            return;
+        }
+
+        sourceCard.name = card.name;
+        sourceCard.content = card.content;
+        updateCard(card);
+        setListCardDatasCol({ ...listCardDatasCol });
+    };
+
+    const handleAddCardMember = (
+        cardId: string,
+        memberId: string,
+        memberName: string
+    ) => {
+        if (listCardDatasCol === null) {
+            return;
+        }
+
+        const sourceCard = listCardDatasCol.cards.find(
+            (_card) => _card.cardId === cardId
+        );
+        if (typeof sourceCard === "undefined") {
+            return;
+        }
+
+        sourceCard.members.push({
+            uid: memberId,
+            memberName: memberName,
+        });
+
+        addCardMember({ id: cardId, uid: memberId, memberName });
+        setListCardDatasCol({ ...listCardDatasCol });
+    };
+
+    const handleRemoCardveMember = (cardId: string, memberId: string) => {
+        if (listCardDatasCol === null) {
+            return;
+        }
+
+        const sourceCard = listCardDatasCol.cards.find(
+            (_card) => _card.cardId === cardId
+        );
+        if (typeof sourceCard === "undefined") {
+            return;
+        }
+
+        const index = sourceCard.members.findIndex(
+            (member) => member.uid === memberId
+        );
+        if (index === -1) {
+            return;
+        }
+
+        sourceCard.members.splice(index, 1);
+
+        removeCardMember({ id: cardId, uid: memberId });
         setListCardDatasCol({ ...listCardDatasCol });
     };
 
@@ -284,6 +356,15 @@ const Table = (): JSX.Element | null => {
                                         handleRemoveList={handleRemoveList}
                                         handleRemoveCard={handleRemoveCard}
                                         handleUpdateList={handleUpdateList}
+                                        handleUpdateCard={
+                                            handleEditCardNameContent
+                                        }
+                                        handleAddCardMember={
+                                            handleAddCardMember
+                                        }
+                                        handleRemoCardveMember={
+                                            handleRemoCardveMember
+                                        }
                                     />
                                 )
                             )}

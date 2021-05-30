@@ -1,5 +1,6 @@
 import React from "react";
 import { Droppable } from "react-beautiful-dnd";
+import { UpdateCardData } from "../../../../apis/table";
 import { Card } from "../../../../hooks/autoSubscribe";
 import DndCard from "../card/Card";
 
@@ -7,11 +8,25 @@ interface DndListBoxContentProps {
     listId: string;
     cards: Card[];
     handleRemoveThisCard: (card: Card) => void;
+
+    /** 更新 Card name, content 使用 */
+    updateCard: (card: UpdateCardData) => void;
+    /** 增加 Card member 使用 */
+    addCardMember: (
+        cardId: string,
+        memberId: string,
+        memberName: string
+    ) => void;
+    /** 移除 Card member 使用 */
+    remoCardveMember: (cardId: string, memberId: string) => void;
 }
 const DndListBoxContent = ({
     cards,
     listId,
     handleRemoveThisCard,
+    updateCard,
+    addCardMember,
+    remoCardveMember,
 }: DndListBoxContentProps): JSX.Element => {
     return (
         <Droppable droppableId={listId} type="CARD">
@@ -27,6 +42,9 @@ const DndListBoxContent = ({
                                 key={card.cardId}
                                 card={card}
                                 handleRemoveThisCard={handleRemoveThisCard}
+                                updateCard={updateCard}
+                                addCardMember={addCardMember}
+                                remoCardveMember={remoCardveMember}
                             />
                         ))
                     ) : (

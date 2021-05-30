@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Draggable } from "react-beautiful-dnd";
+import { UpdateCardData } from "../../../../apis/table";
 import { Card, ListCardDatas } from "../../../../hooks/autoSubscribe";
 import AddDndCardBox from "../card/AddCardBox";
 import DndListBoxContent from "./DndListBoxContent";
@@ -16,6 +17,17 @@ interface Props {
     handleRemoveCard: (listCardDatas: ListCardDatas, card: Card) => void;
     handleRemoveList: (listCardDatas: ListCardDatas) => void;
     handleUpdateList: (listCardDatas: ListCardDatas) => void;
+
+    /** 更新 Card name, content 使用 */
+    handleUpdateCard: (card: UpdateCardData) => void;
+    /** 增加 Card member 使用 */
+    handleAddCardMember: (
+        cardId: string,
+        memberId: string,
+        memberName: string
+    ) => void;
+    /** 移除 Card member 使用 */
+    handleRemoCardveMember: (cardId: string, memberId: string) => void;
 }
 const DndList = ({
     listCardDatas,
@@ -23,6 +35,9 @@ const DndList = ({
     handleRemoveCard,
     handleRemoveList,
     handleUpdateList,
+    handleUpdateCard: handleupdateCard,
+    handleAddCardMember: handleaddCardMember,
+    handleRemoCardveMember: handleremoCardveMember,
 }: Props): JSX.Element => {
     // console.log("listCardDatas.list.index", listCardDatas.list.index);
     const [openFunctions, setOpenFunctions] = useState(false);
@@ -104,6 +119,9 @@ const DndList = ({
                         cards={listCardDatas.cards}
                         listId={listCardDatas.list.listId}
                         handleRemoveThisCard={handleRemoveThisCard}
+                        updateCard={handleupdateCard}
+                        addCardMember={handleaddCardMember}
+                        remoCardveMember={handleremoCardveMember}
                     />
                 </div>
             )}
