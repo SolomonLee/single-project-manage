@@ -156,22 +156,15 @@ export const updateBatchCard = async (
     return resultError("更新 Card 失敗", null);
 };
 
-export interface CardMemberData {
-    memberName: string;
-    /** member ID */
-    uid: string;
-}
 export interface UpdateCardData {
     id: string;
     content: string;
     name: string;
-    members: CardMemberData[];
 }
 export const updateCard = async ({
     id,
     content,
     name,
-    members,
 }: UpdateCardData): Promise<Result<null>> => {
     try {
         firebase
@@ -180,7 +173,6 @@ export const updateCard = async ({
                 id,
                 content,
                 name,
-                members,
             })
             .then((result) => {
                 if (!result.data.result) {
@@ -196,6 +188,71 @@ export const updateCard = async ({
     }
 
     return resultError("更新 Card 失敗", null);
+};
+
+interface CardMemberBasic {
+    /** card ID */
+    id: string;
+    /** user ID */
+    uid: string;
+}
+interface CardMember extends CardMemberBasic {
+    memberName: string;
+}
+export const addCardMember = async ({
+    id,
+    uid,
+    memberName,
+}: CardMember): Promise<Result<null>> => {
+    try {
+        firebase
+            .functions()
+            .httpsCallable("addCardMember")({
+                id,
+                uid,
+                memberName,
+            })
+            .then((result) => {
+                if (!result.data.result) {
+                    addMessage("增加 Card 成員 失敗, 請重新整理頁面", "Fail");
+                } else {
+                    addMessage(`增加 Card 成員 成功!`, "Ok");
+                }
+            });
+
+        return resultOk(null);
+    } catch (e) {
+        console.log("增加 Card 成員 失敗 ", e);
+    }
+
+    return resultError("增加 Card 成員 失敗", null);
+};
+
+export const removeCardMember = async ({
+    id,
+    uid,
+}: CardMemberBasic): Promise<Result<null>> => {
+    try {
+        firebase
+            .functions()
+            .httpsCallable("removeCardMember")({
+                id,
+                uid,
+            })
+            .then((result) => {
+                if (!result.data.result) {
+                    addMessage("移除 Card 成員 失敗, 請重新整理頁面", "Fail");
+                } else {
+                    addMessage(`移除 Card 成員 成功!`, "Ok");
+                }
+            });
+
+        return resultOk(null);
+    } catch (e) {
+        console.log("移除 Card 成員 失敗 ", e);
+    }
+
+    return resultError("移除 Card 成員 失敗", null);
 };
 
 export const removeCard = async (
