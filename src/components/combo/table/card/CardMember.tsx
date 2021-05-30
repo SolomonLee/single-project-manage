@@ -16,7 +16,11 @@ const CardMember = ({
 
     return (
         <span className="card_member" onClick={handleClick}>
-            {memberName}
+            <div className="user">
+                <span className="name">
+                    <span>{memberName}</span>
+                </span>
+            </div>
         </span>
     );
 };

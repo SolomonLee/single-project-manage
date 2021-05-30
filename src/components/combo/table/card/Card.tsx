@@ -78,7 +78,10 @@ const DndCard = ({
                             {data.name}
                         </div>
                         <div className="functions">
-                            <button className="btn btn_style3 btn-sm">
+                            <button
+                                type="button"
+                                className="btn btn_style3 btn-sm"
+                            >
                                 <i
                                     className="bi bi-x"
                                     onClick={handleRemoveCard}

@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import { Card } from "../../../../hooks/autoSubscribe";
-import addMessage from "../../message/Message";
 import AddCardMember from "./AddCardMember";
 import CardMember from "./CardMember";
 
@@ -15,7 +14,6 @@ const EditCardMember = ({
     removeMember,
 }: Props): JSX.Element => {
     const handleAddMember = (memberId: string, memberName: string) => {
-        console.log(card.cardId, memberId, memberName);
         addMember(memberId, memberName);
     };
 
@@ -40,7 +38,6 @@ const EditCardMember = ({
                 memberIds={card.members.map((member) => member.uid)}
                 handleAddMember={handleAddMember}
             />
-            <div className="member">Solomon</div>
         </div>
     );
 };

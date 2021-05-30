@@ -155,6 +155,7 @@ export const { signOut } = userSlice.actions;
 
 export const selectUserEmail = (state: RootState): string => state.user.email;
 export const selectUserName = (state: RootState): string => state.user.userName;
+export const selectUserUid = (state: RootState): string => state.user.uid;
 export const selectUserInSignIn = (state: RootState): boolean =>
     state.user.inSignIn;
 

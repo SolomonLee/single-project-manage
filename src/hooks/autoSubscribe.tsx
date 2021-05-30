@@ -11,6 +11,7 @@ export interface Member {
 }
 
 export interface MemberSimple {
+    uid: string;
     name: string;
     onlineTimestamp: number;
 }
@@ -41,7 +42,7 @@ export const useSubMemberList = (): Member[] => {
                                         doc.data() as MemberSimple;
 
                                     tempMemberList.push({
-                                        id: doc.id,
+                                        id: memberSimple.uid,
                                         name: memberSimple.name,
                                         onlineTimestamp:
                                             memberSimple.onlineTimestamp,
@@ -447,4 +448,99 @@ export const useSubListCardDatas = (): ListCardDatasCollection | null => {
     }, [lists, cards]);
 
     return listCardDatas;
+};
+
+interface MessageContentSnapshot {
+    content: string;
+    timestamp: number;
+    uid: string;
+}
+interface MessageContentBasic {
+    contentId: string;
+    content: string;
+    timestamp: number;
+    uid: string;
+}
+export interface MessageContent extends MessageContentBasic {
+    userName: string;
+}
+/** 使用 Message Id, 訂閱 Message資料, 並包裝好 使用者名稱 */
+export const useSubMessageContent = (messageId: string): MessageContent[] => {
+    const refIsMount = useGetMount();
+    const refSubMessageContent = useRef<undefined | (() => void)>(undefined);
+    const [messageContentBasics, setMessageContentBasics] = useState<
+        MessageContentBasic[]
+    >([]);
+    const [messageContents, setMessageContents] = useState<MessageContent[]>(
+        []
+    );
+    const memberList = useSubMemberList();
+    console.log("memberList", memberList);
+
+    useIfSingIn(
+        () => {
+            setTimeout(() => {
+                refSubMessageContent.current = firebase
+                    .firestore()
+                    .collection("messages")
+                    .doc(messageId)
+                    .collection("contents")
+                    .orderBy("timestamp", "desc")
+                    .onSnapshot((querySnapshot) => {
+                        const tempMessageContents = [] as MessageContentBasic[];
+
+                        querySnapshot.forEach((doc) => {
+                            if (!doc.exists || refIsMount.current) {
+                                const messageContentSnapshot =
+                                    doc.data() as MessageContentSnapshot;
+
+                                tempMessageContents.push({
+                                    contentId: doc.id,
+                                    content: messageContentSnapshot.content,
+                                    timestamp: messageContentSnapshot.timestamp,
+                                    uid: messageContentSnapshot.uid,
+                                });
+                            }
+                        });
+
+                        if (refIsMount.current) {
+                            setMessageContentBasics(tempMessageContents);
+                        }
+                    });
+            });
+        },
+        () => {
+            if (typeof refSubMessageContent.current !== "undefined") {
+                refSubMessageContent.current();
+                refSubMessageContent.current = undefined;
+            }
+        }
+    );
+
+    useEffect(() => {
+        const tempMessageContents = [] as MessageContent[];
+
+        messageContentBasics.forEach((messageContentBasic) => {
+            const member = memberList.find(
+                (member) => member.id === messageContentBasic.uid
+            );
+            if (typeof member !== "undefined") {
+                tempMessageContents.push({
+                    ...messageContentBasic,
+                    userName: member.name,
+                });
+            } else {
+                tempMessageContents.push({
+                    ...messageContentBasic,
+                    userName: "",
+                });
+            }
+        });
+
+        if (refIsMount.current) {
+            setMessageContents(tempMessageContents);
+        }
+    }, [messageContentBasics, memberList]);
+
+    return messageContents;
 };

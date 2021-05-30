@@ -93,6 +93,7 @@ const DndList = ({
                             />
                         </div>
                         <button
+                            type="button"
                             className="btn btn_style2 btn-sm"
                             onClick={handleOpenFunctions}
                         >
