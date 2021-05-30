@@ -15,6 +15,7 @@ interface Props {
     isOpen: boolean;
     setClose: undefined | React.MouseEventHandler<HTMLButtonElement>;
     stylenum: number | undefined;
+    className?: string;
 }
 
 const Modal = ({
@@ -22,6 +23,7 @@ const Modal = ({
     isOpen,
     stylenum,
     setClose = undefined,
+    className,
 }: Props): JSX.Element | null => {
     const refModal = useRef(document.getElementById("ModalBox"));
 
@@ -42,7 +44,12 @@ const Modal = ({
         return ReactDOM.createPortal(
             <>
                 <div className="modal-mask" />
-                <div className="modal" data-style={stylenum}>
+                <div
+                    className={`modal ${
+                        typeof className === "undefined" ? "" : className
+                    }`}
+                    data-style={stylenum}
+                >
                     {typeof setClose !== "undefined" ? (
                         <button
                             type="button"

@@ -51,7 +51,12 @@ const DndCard = ({
 
     return (
         <>
-            <Modal isOpen={isOpen} setClose={handleClose} stylenum={1}>
+            <Modal
+                isOpen={isOpen}
+                setClose={handleClose}
+                stylenum={1}
+                className="modal_lg"
+            >
                 <CardEditForm
                     card={data}
                     updateCard={handleUpdateCard}
