@@ -148,6 +148,10 @@ const Table = (): JSX.Element | null => {
         }
     };
 
+    const handleUpdateList = (listCardDatas: ListCardDatas) => {
+        handleUpdateLists([listCardDatas.list]);
+    };
+
     const handleRemoveList = (listCardData: ListCardDatas) => {
         if (listCardDatasCol === null) return;
 
@@ -279,6 +283,7 @@ const Table = (): JSX.Element | null => {
                                         handleCreateCard={handleCreateCard}
                                         handleRemoveList={handleRemoveList}
                                         handleRemoveCard={handleRemoveCard}
+                                        handleUpdateList={handleUpdateList}
                                     />
                                 )
                             )}
