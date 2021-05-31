@@ -4,6 +4,8 @@ import "firebase/firestore";
 import { useIfSingIn } from "./authHook";
 import { useGetMount } from "./controlComponent";
 import addMessage from "../components/combo/message/Message";
+import { boolean, string } from "yup/lib/locale";
+import { updateBatchCard, updateBatchList } from "../apis/table";
 
 export interface Member {
     id: string;
@@ -113,80 +115,110 @@ const sortListsByNextId = (
     listCardDatas: ListCardDatas[],
     lists: List[]
 ): void => {
+    const copyLists = [...lists];
     const sortLists = [] as List[];
+    const lostLists = [] as List[];
     const existListId = [] as string[];
+    const onExistId = (id: string) =>
+        existListId.findIndex((listId) => listId === id) !== -1;
+    const addExistId = (id: string) => existListId.push(id);
 
-    lists.forEach((list) => {
-        if (sortLists.length === lists.length) return;
+    if (copyLists.length === 0) return;
+    for (let i = 0; i < copyLists.length; i++) {
+        if (onExistId(copyLists[i].listId)) continue;
 
-        if (existListId.findIndex((listId) => listId === list.listId) === -1) {
-            /** is unsort list */
-            const tempSortLists = [] as List[];
+        const tempSortLists = [] as List[];
 
-            let sortListFirstId = "";
+        let sortFirstId = "";
+        let sortTempNextId = "";
+        if (sortLists.length > 0) {
+            sortFirstId = sortLists[0].listId;
+        }
 
-            if (sortLists.length > 0) {
-                sortListFirstId = sortLists[0].listId;
+        let isLink = false;
+        for (let j = i; j < copyLists.length; j++) {
+            if (onExistId(copyLists[j].listId)) continue;
+
+            if (copyLists[j].nextListId === sortFirstId) {
+                isLink = true;
+                addExistId(copyLists[j].listId);
+                sortLists.unshift(copyLists[j]);
+
+                for (let k = tempSortLists.length - 1; k >= 0; k--) {
+                    sortLists.unshift(tempSortLists[k]);
+                }
+                break;
             }
 
-            tempSortLists.push(list);
-            existListId.push(list.listId);
-            let nextList = list;
-            for (;;) {
-                if (nextList.nextListId === sortListFirstId) {
-                    for (let i = tempSortLists.length - 1; i >= 0; i--) {
-                        sortLists.unshift(tempSortLists[i]);
-                    }
+            if (copyLists[j].nextListId === "") {
+                addExistId(copyLists[j].listId);
+                tempSortLists.push(copyLists[j]);
+                break;
+            }
 
-                    break;
-                }
-
-                const findNextList = lists.find(
-                    (fList) => fList.listId === nextList.nextListId
-                );
-
-                if (typeof findNextList !== "undefined") {
-                    if (existListId.indexOf(findNextList.listId) === -1) {
-                        existListId.push(findNextList.listId);
-                        tempSortLists.push(findNextList);
-                        nextList = findNextList;
-                    } else {
-                        nextList.nextListId = "";
-                        console.log(
-                            "sortListsByNextId ERROR #1",
-                            existListId,
-                            tempSortLists
-                        );
-                        addMessage("出現異常 請重新整理頁面", "Fail");
-                        break;
-                    }
-                } else {
-                    nextList.nextListId = "";
-                    console.log("sortListsByNextId ERROR #2");
-                    addMessage("出現異常 請重新整理頁面", "Fail");
-                    break;
-                    // throw "sortListsByNextId ERROR";
-                }
+            if (
+                sortTempNextId === "" ||
+                sortTempNextId === copyLists[j].listId
+            ) {
+                addExistId(copyLists[j].listId);
+                tempSortLists.push(copyLists[j]);
+                sortTempNextId = copyLists[j].nextListId;
             }
         }
-    });
 
-    if (sortLists.length > 1) {
-        for (let i = 1; i < sortLists.length; i++) {
-            sortLists[i].prevListId = sortLists[i - 1].listId;
-            sortLists[i].index = i;
+        if (!isLink && tempSortLists.length) {
+            tempSortLists.forEach((lostList) => {
+                lostLists.push(lostList);
+            });
         }
     }
 
-    if (sortLists.length > 0) {
+    if (lostLists.length) {
+        addMessage("發現 迷路 List", "Fail");
+        lostLists.forEach((lostList) => {
+            sortLists.push(lostList);
+        });
+    }
+
+    if (sortLists.length > 1) {
+        const lastIndex = sortLists.length - 1;
+        for (let i = 1; i < lastIndex - 1; i++) {
+            sortLists[i].nextListId = sortLists[i + 1].listId;
+            sortLists[i].prevListId = sortLists[i - 1].listId;
+            sortLists[i].index = i;
+        }
+
+        sortLists[0].nextListId = sortLists[1].listId;
         sortLists[0].prevListId = "";
         sortLists[0].index = 0;
-        for (let i = 0; i < sortLists.length; i++) {
-            listCardDatas.push({
-                list: sortLists[i],
-                cards: [],
-            });
-        }
+
+        sortLists[lastIndex].nextListId = "";
+        sortLists[lastIndex].prevListId = sortLists[lastIndex - 1].listId;
+        sortLists[lastIndex].index = lastIndex;
+    }
+
+    if (sortLists.length === 0) {
+        sortLists[0].nextListId = "";
+        sortLists[0].prevListId = "";
+        sortLists[0].index = 0;
+    }
+
+    if (lostLists.length) {
+        addMessage("自動更新 迷路 Lists", "Common");
+        updateBatchList(
+            sortLists.map((sortList) => ({
+                id: sortList.listId,
+                name: sortList.name,
+                nextListId: sortList.nextListId,
+            }))
+        );
+    }
+
+    for (let i = 0; i < sortLists.length; i++) {
+        listCardDatas.push({
+            list: sortLists[i],
+            cards: [],
+        });
     }
 };
 
@@ -197,88 +229,114 @@ const sortCardsByNextId = (
 ): void => {
     /** 依照每個 List, 建立 Cards 鏈結陣列 */
     listCardDatas.forEach((listCard) => {
-        const filterListCards = cards.filter(
+        /** 篩選過 屬於此 List 的 Cards */
+        const fCards = cards.filter(
             (card) => card.listId === listCard.list.listId
         );
-        const existListCardId = [] as string[];
-        const sortListCards = [] as Card[];
 
-        filterListCards.forEach((fListCard) => {
-            if (sortListCards.length === filterListCards.length) return;
+        const existCardIds = [] as string[];
+        const sortCards = [] as Card[];
+        const lostCards = [] as Card[];
 
-            if (
-                existListCardId.findIndex(
-                    (cardId) => cardId === fListCard.cardId
-                ) === -1
-            ) {
-                let sortListCardsFirstId = "";
+        const onExistId = (id: string) =>
+            existCardIds.findIndex((cardId) => cardId === id) !== -1;
+        const addExistId = (id: string) => existCardIds.push(id);
 
-                if (sortListCards.length > 0) {
-                    sortListCardsFirstId = sortListCards[0].cardId;
+        if (fCards.length === 0) return;
+        for (let i = 0; i < fCards.length; i++) {
+            if (onExistId(fCards[i].cardId)) continue;
+
+            const tempSortCards = [] as Card[];
+
+            let sortFirstId = "";
+            let sortTempNextId = "";
+            if (sortCards.length > 0) {
+                sortFirstId = sortCards[0].cardId;
+            }
+
+            let isLink = false;
+            for (let j = i; j < fCards.length; j++) {
+                if (onExistId(fCards[j].cardId)) continue;
+
+                if (fCards[j].nextCardId === sortFirstId) {
+                    isLink = true;
+                    addExistId(fCards[j].cardId);
+                    sortCards.unshift(fCards[j]);
+
+                    for (let k = tempSortCards.length - 1; k >= 0; k--) {
+                        sortCards.unshift(tempSortCards[k]);
+                    }
+                    break;
                 }
 
-                const tempSortListCards = [fListCard];
-                let nextListCard = fListCard;
-                // console.log("====================");
-                for (;;) {
-                    if (
-                        nextListCard.nextCardId === sortListCardsFirstId ||
-                        nextListCard.nextCardId === ""
-                    ) {
-                        for (
-                            let i = tempSortListCards.length - 1;
-                            i >= 0;
-                            i--
-                        ) {
-                            sortListCards.unshift(tempSortListCards[i]);
-                        }
+                if (fCards[j].nextCardId === "") {
+                    addExistId(fCards[j].cardId);
+                    tempSortCards.push(fCards[j]);
+                    break;
+                }
 
-                        break;
-                    }
-
-                    const findNextListCard = filterListCards.find(
-                        (fCard) => fCard.cardId === nextListCard.nextCardId
-                    );
-
-                    if (typeof findNextListCard !== "undefined") {
-                        if (
-                            existListCardId.indexOf(findNextListCard.cardId) ===
-                            -1
-                        ) {
-                            existListCardId.push(findNextListCard.cardId);
-                            tempSortListCards.push(findNextListCard);
-                            nextListCard = findNextListCard;
-                        } else {
-                            nextListCard.nextCardId = "";
-                            console.log("sortCardsByNextId ERROR #1");
-                            addMessage("出現異常 請重新整理頁面", "Fail");
-                            break;
-                        }
-                    } else {
-                        nextListCard.nextCardId = "";
-                        console.log("sortCardsByNextId ERROR #2");
-                        addMessage("出現異常 請重新整理頁面", "Fail");
-                        break;
-                        // throw "sortCardsByNextId ERROR #2";
-                    }
-                    // console.log("==========");
+                if (
+                    sortTempNextId === "" ||
+                    sortTempNextId === fCards[j].cardId
+                ) {
+                    addExistId(fCards[j].cardId);
+                    tempSortCards.push(fCards[j]);
+                    sortTempNextId = fCards[j].nextCardId;
                 }
             }
-        });
 
-        if (sortListCards.length > 1) {
-            for (let i = 1; i < sortListCards.length; i++) {
-                sortListCards[i].prevCardId = sortListCards[i - 1].cardId;
+            if (!isLink && tempSortCards.length) {
+                tempSortCards.forEach((lostCard) => {
+                    lostCards.push(lostCard);
+                });
             }
         }
 
-        if (sortListCards.length > 0) {
-            for (let i = 0; i < sortListCards.length; i++) {
-                sortListCards[i].index = i;
-            }
+        if (lostCards.length) {
+            addMessage("發現 迷路 Card", "Fail");
+            lostCards.forEach((lostCard) => {
+                sortCards.push(lostCard);
+            });
         }
 
-        listCard.cards = sortListCards;
+        if (sortCards.length > 1) {
+            const lastIndex = sortCards.length - 1;
+            for (let i = 1; i < lastIndex - 1; i++) {
+                sortCards[i].nextCardId = sortCards[i + 1].cardId;
+                sortCards[i].prevCardId = sortCards[i - 1].cardId;
+                sortCards[i].index = i;
+            }
+
+            sortCards[0].nextCardId = sortCards[1].cardId;
+            sortCards[0].prevCardId = "";
+            sortCards[0].index = 0;
+
+            sortCards[lastIndex].nextCardId = "";
+            sortCards[lastIndex].prevCardId = sortCards[lastIndex - 1].cardId;
+            sortCards[lastIndex].index = lastIndex;
+        }
+
+        if (sortCards.length === 0) {
+            sortCards[0].nextCardId = "";
+            sortCards[0].prevCardId = "";
+            sortCards[0].index = 0;
+        }
+
+        if (lostCards.length) {
+            addMessage("自動更新 迷路 Cards", "Common");
+
+            updateBatchCard(
+                sortCards.map((sortCard) => ({
+                    id: sortCard.cardId,
+                    content: sortCard.content,
+                    listId: sortCard.listId,
+                    name: sortCard.name,
+                    nextCardId: sortCard.nextCardId,
+                }))
+            );
+        }
+
+        listCard.cards = sortCards;
     });
 };
 
