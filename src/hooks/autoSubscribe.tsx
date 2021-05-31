@@ -115,66 +115,64 @@ const sortListsByNextId = (
 ): void => {
     const copyLists = [...lists];
     const sortLists = [] as List[];
-    const lostLists = [] as List[];
     const existListId = [] as string[];
-    const onExistId = (id: string) =>
+    const isExistId = (id: string) =>
         existListId.findIndex((listId) => listId === id) !== -1;
     const addExistId = (id: string) => existListId.push(id);
 
     if (copyLists.length === 0) return;
+    sortLists.push(copyLists[0]);
+    let nowList = copyLists[0];
     for (let i = 0; i < copyLists.length; i++) {
-        if (onExistId(copyLists[i].listId)) continue;
-
-        const tempSortLists = [] as List[];
-
-        let sortFirstId = "";
-        let sortTempNextId = "";
-        if (sortLists.length > 0) {
-            sortFirstId = sortLists[0].listId;
+        /** 鏈結 向後找 */
+        if (nowList.nextListId === "") {
+            break;
         }
 
-        let isLink = false;
-        for (let j = i; j < copyLists.length; j++) {
-            if (onExistId(copyLists[j].listId)) continue;
+        const nextList = copyLists.find(
+            (list) => list.listId === nowList.nextListId
+        );
 
-            if (copyLists[j].nextListId === sortFirstId) {
-                isLink = true;
-                addExistId(copyLists[j].listId);
-                sortLists.unshift(copyLists[j]);
+        if (typeof nextList === "undefined" || isExistId(nextList.listId)) {
+            break;
+        }
 
-                for (let k = tempSortLists.length - 1; k >= 0; k--) {
-                    sortLists.unshift(tempSortLists[k]);
-                }
+        addExistId(nextList.listId);
+        sortLists.push(nextList);
+        nowList = nextList;
+    }
+
+    if (copyLists.length !== sortLists.length) {
+        /** 鏈結 向前找 */
+        nowList = sortLists[0] as List;
+        for (let i = 0; i < copyLists.length; i++) {
+            /** 鏈結 向後找 */
+            const prevList = copyLists.find(
+                (list) => list.nextListId === nowList.listId
+            );
+
+            if (typeof prevList === "undefined" || isExistId(prevList.listId)) {
                 break;
             }
 
-            if (copyLists[j].nextListId === "") {
-                addExistId(copyLists[j].listId);
-                tempSortLists.push(copyLists[j]);
-                break;
-            }
-
-            if (
-                sortTempNextId === "" ||
-                sortTempNextId === copyLists[j].listId
-            ) {
-                addExistId(copyLists[j].listId);
-                tempSortLists.push(copyLists[j]);
-                sortTempNextId = copyLists[j].nextListId;
-            }
-        }
-
-        if (!isLink && tempSortLists.length) {
-            tempSortLists.forEach((lostList) => {
-                lostLists.push(lostList);
-            });
+            addExistId(prevList.listId);
+            sortLists.unshift(prevList);
+            nowList = prevList;
         }
     }
 
-    if (lostLists.length) {
+    if (copyLists.length !== sortLists.length) {
+        /** 剩餘 判斷為 迷路 List */
         addMessage("發現 迷路 List", "Fail");
-        lostLists.forEach((lostList) => {
-            sortLists.push(lostList);
+        copyLists.forEach((copyList) => {
+            const index = sortLists.findIndex(
+                (sordList) => sordList.listId === copyList.listId
+            );
+
+            if (index === -1) {
+                /** find lost List */
+                sortLists.push(copyList);
+            }
         });
     }
 
@@ -217,72 +215,72 @@ const sortCardsByNextId = (
     /** 依照每個 List, 建立 Cards 鏈結陣列 */
     listCardDatas.forEach((listCard) => {
         /** 篩選過 屬於此 List 的 Cards */
-        const fCards = cards.filter(
+        const copyCards = cards.filter(
             (card) => card.listId === listCard.list.listId
         );
-
-        const existCardIds = [] as string[];
         const sortCards = [] as Card[];
-        const lostCards = [] as Card[];
+        const existCardId = [] as string[];
+        const isExistId = (id: string) =>
+            existCardId.findIndex((cardId) => cardId === id) !== -1;
+        const addExistId = (id: string) => existCardId.push(id);
 
-        const onExistId = (id: string) =>
-            existCardIds.findIndex((cardId) => cardId === id) !== -1;
-        const addExistId = (id: string) => existCardIds.push(id);
+        if (copyCards.length === 0) return;
 
-        if (fCards.length === 0) return;
-        for (let i = 0; i < fCards.length; i++) {
-            if (onExistId(fCards[i].cardId)) continue;
-
-            const tempSortCards = [] as Card[];
-
-            let sortFirstId = "";
-            let sortTempNextId = "";
-            if (sortCards.length > 0) {
-                sortFirstId = sortCards[0].cardId;
+        sortCards.push(copyCards[0]);
+        let nowCard = copyCards[0];
+        for (let i = 0; i < copyCards.length; i++) {
+            /** 鏈結 向後找 */
+            if (nowCard.nextCardId === "") {
+                break;
             }
 
-            let isLink = false;
-            for (let j = i; j < fCards.length; j++) {
-                if (onExistId(fCards[j].cardId)) continue;
+            const nextCard = copyCards.find(
+                (card) => card.cardId === nowCard.nextCardId
+            );
 
-                if (fCards[j].nextCardId === sortFirstId) {
-                    isLink = true;
-                    addExistId(fCards[j].cardId);
-                    sortCards.unshift(fCards[j]);
+            if (typeof nextCard === "undefined" || isExistId(nextCard.cardId)) {
+                break;
+            }
 
-                    for (let k = tempSortCards.length - 1; k >= 0; k--) {
-                        sortCards.unshift(tempSortCards[k]);
-                    }
-                    break;
-                }
+            addExistId(nextCard.cardId);
+            sortCards.push(nextCard);
+            nowCard = nextCard;
+        }
 
-                if (fCards[j].nextCardId === "") {
-                    addExistId(fCards[j].cardId);
-                    tempSortCards.push(fCards[j]);
-                    break;
-                }
+        if (copyCards.length !== sortCards.length) {
+            /** 鏈結 向前找 */
+            nowCard = sortCards[0] as Card;
+            for (let i = 0; i < copyCards.length; i++) {
+                /** 鏈結 向後找 */
+                const prevCard = copyCards.find(
+                    (card) => card.nextCardId === nowCard.cardId
+                );
 
                 if (
-                    sortTempNextId === "" ||
-                    sortTempNextId === fCards[j].cardId
+                    typeof prevCard === "undefined" ||
+                    isExistId(prevCard.cardId)
                 ) {
-                    addExistId(fCards[j].cardId);
-                    tempSortCards.push(fCards[j]);
-                    sortTempNextId = fCards[j].nextCardId;
+                    break;
                 }
-            }
 
-            if (!isLink && tempSortCards.length) {
-                tempSortCards.forEach((lostCard) => {
-                    lostCards.push(lostCard);
-                });
+                addExistId(prevCard.cardId);
+                sortCards.unshift(prevCard);
+                nowCard = prevCard;
             }
         }
 
-        if (lostCards.length) {
-            addMessage("發現 迷路 Card", "Fail");
-            lostCards.forEach((lostCard) => {
-                sortCards.push(lostCard);
+        if (copyCards.length !== sortCards.length) {
+            /** 剩餘 判斷為 迷路 Card */
+            addMessage(`發現 ${listCard.list.name} 有迷路 Card`, "Fail");
+            copyCards.forEach((copyCard) => {
+                const index = sortCards.findIndex(
+                    (sordCard) => sordCard.cardId === copyCard.cardId
+                );
+
+                if (index === -1) {
+                    /** find lost Card */
+                    sortCards.push(copyCard);
+                }
             });
         }
 
@@ -562,7 +560,7 @@ export const useSubListCardDatas = (): ListCardDatasCollection => {
                                 listCardDatas: tempListCardDatas,
                             });
                         },
-                        500
+                        1000
                     );
                 }
             }

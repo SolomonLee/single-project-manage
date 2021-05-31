@@ -12,8 +12,6 @@ import RoutePages from "./components/pages/route/RoutePages";
 function App(): JSX.Element {
     return (
         <div className="App">
-            <ModalBox />
-            <MessageBox />
             <RootHeader>
                 <Header />
             </RootHeader>
@@ -21,6 +19,8 @@ function App(): JSX.Element {
                 <RoutePages />
             </RootBody>
             <RootFooter>2021 by Solomon</RootFooter>
+            <ModalBox />
+            <MessageBox />
         </div>
     );
 }

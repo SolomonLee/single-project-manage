@@ -70,6 +70,29 @@
             height: 20px;
             line-height: 20px;
 
+            @keyframes logo-rotate {
+                0% {
+                    transform: rotate(0deg);
+                }
+                20% {
+                    transform: rotate(100deg);
+                }
+                40% {
+                    transform: rotate(-400deg);
+                }
+                60% {
+                    transform: rotate(200deg);
+                }
+                80% {
+                    transform: rotate(100deg);
+                }
+                100% {
+                    transform: rotate(720deg);
+                }
+            }
+
+            animation: logo-rotate 2s infinite;
+
             img {
                 vertical-align: bottom;
             }
