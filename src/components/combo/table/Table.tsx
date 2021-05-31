@@ -31,21 +31,113 @@ import { useGetMount } from "../../../hooks/controlComponent";
 import AddListBox from "./list/AddListBox";
 import DndList from "./list/List";
 
+/** 比對新舊 listCardDatasCol 是否為相同資料 */
+const comparisonListCardDatasCol = (
+    orgLCDC: ListCardDatasCollection,
+    newLCDC: ListCardDatasCollection
+) => {
+    if (
+        orgLCDC.listCardDatas.length != newLCDC.listCardDatas.length ||
+        orgLCDC.lists.length != newLCDC.lists.length ||
+        orgLCDC.cards.length != newLCDC.cards.length
+    ) {
+        return false;
+    } else {
+        let isSameData = true;
+        orgLCDC.listCardDatas.forEach((orgLCD) => {
+            if (!isSameData) return;
+            const newLCD = newLCDC.listCardDatas.find(
+                (newLCD) => newLCD.list.listId === orgLCD.list.listId
+            );
+
+            if (typeof newLCD === "undefined") {
+                isSameData = false;
+                return;
+            }
+
+            if (
+                newLCD.list.index !== orgLCD.list.index ||
+                newLCD.list.name !== orgLCD.list.name ||
+                newLCD.list.nextListId !== orgLCD.list.nextListId ||
+                newLCD.list.prevListId !== orgLCD.list.prevListId
+            ) {
+                isSameData = false;
+                return;
+            }
+
+            if (newLCD.cards.length != orgLCD.cards.length) {
+                isSameData = false;
+                return;
+            }
+
+            orgLCD.cards.forEach((orgCard) => {
+                if (!isSameData) return;
+                const newCard = newLCD.cards.find(
+                    (newCard) => newCard.cardId === orgCard.cardId
+                );
+
+                if (typeof newCard === "undefined") {
+                    isSameData = false;
+                    return;
+                }
+
+                if (
+                    newCard.content !== orgCard.content ||
+                    newCard.name !== orgCard.name ||
+                    newCard.nextCardId !== orgCard.nextCardId ||
+                    newCard.prevCardId !== orgCard.prevCardId
+                ) {
+                    isSameData = false;
+                    return;
+                }
+
+                if (newCard.members.length !== orgCard.members.length) {
+                    isSameData = false;
+                    return;
+                }
+
+                orgCard.members.forEach((orgMbr) => {
+                    if (!isSameData) return;
+                    const newMbr = newCard.members.find(
+                        (newMbr) =>
+                            newMbr.uid === orgMbr.uid &&
+                            newMbr.memberName === orgMbr.memberName
+                    );
+
+                    if (typeof newMbr === "undefined") {
+                        isSameData = false;
+                        return;
+                    }
+                });
+            });
+        });
+
+        return isSameData;
+    }
+};
+
 const Table = (): JSX.Element | null => {
-    const subListCardDatasCollection = useSubListCardDatas();
+    const subListCardDatasCol = useSubListCardDatas();
     const isMount = useGetMount();
     const [listCardDatasCol, setListCardDatasCol] =
-        useState<ListCardDatasCollection | null>(null);
+        useState<ListCardDatasCollection>({
+            listCardDatas: [],
+            lists: [],
+            cards: [],
+        });
 
     useEffect(() => {
         if (isMount.current) {
-            setListCardDatasCol(subListCardDatasCollection);
+            if (
+                !comparisonListCardDatasCol(
+                    listCardDatasCol,
+                    subListCardDatasCol
+                )
+            ) {
+                setListCardDatasCol(subListCardDatasCol);
+            }
         }
-    }, [subListCardDatasCollection]);
-
-    // useEffect(() => {
-    //     console.log("listCardDatasCol Update");
-    // }, [listCardDatasCol]);
+    }, [subListCardDatasCol]);
 
     const handleCreateCard = (
         listId: string,

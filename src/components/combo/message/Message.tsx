@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { randomString } from "../../../common/random";
 
 interface MessageDataBase {
     state: "Common" | "Fail" | "Ok";
@@ -40,16 +41,25 @@ const addMessage = (
     context: string,
     state: "Common" | "Fail" | "Ok" = "Common"
 ): void => {
-    const now = Date.now().toString();
+    let id = Date.now().toString();
+
+    if (
+        messageDatas.findIndex((messageData) => {
+            messageData.id === id;
+        }) !== -1
+    ) {
+        id = `${id}${randomString(15)}`;
+    }
+
     messageDatas.push({
         state,
         context,
-        id: now,
+        id: id,
     });
 
     setTimeout(() => {
         messageDatas.splice(
-            messageDatas.findIndex((messageData) => messageData.id === now),
+            messageDatas.findIndex((messageData) => messageData.id === id),
             1
         );
 
