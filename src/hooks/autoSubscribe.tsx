@@ -4,8 +4,6 @@ import "firebase/firestore";
 import { useIfSingIn } from "./authHook";
 import { useGetMount } from "./controlComponent";
 import addMessage from "../components/combo/message/Message";
-import { boolean, string } from "yup/lib/locale";
-import { updateBatchCard, updateBatchList } from "../apis/table";
 
 export interface Member {
     id: string;
@@ -182,7 +180,7 @@ const sortListsByNextId = (
 
     if (sortLists.length > 1) {
         const lastIndex = sortLists.length - 1;
-        for (let i = 1; i < lastIndex - 1; i++) {
+        for (let i = 1; i < lastIndex; i++) {
             sortLists[i].nextListId = sortLists[i + 1].listId;
             sortLists[i].prevListId = sortLists[i - 1].listId;
             sortLists[i].index = i;
@@ -201,17 +199,6 @@ const sortListsByNextId = (
         sortLists[0].nextListId = "";
         sortLists[0].prevListId = "";
         sortLists[0].index = 0;
-    }
-
-    if (lostLists.length) {
-        addMessage("自動更新 迷路 Lists", "Common");
-        updateBatchList(
-            sortLists.map((sortList) => ({
-                id: sortList.listId,
-                name: sortList.name,
-                nextListId: sortList.nextListId,
-            }))
-        );
     }
 
     for (let i = 0; i < sortLists.length; i++) {
@@ -301,7 +288,7 @@ const sortCardsByNextId = (
 
         if (sortCards.length > 1) {
             const lastIndex = sortCards.length - 1;
-            for (let i = 1; i < lastIndex - 1; i++) {
+            for (let i = 1; i < lastIndex; i++) {
                 sortCards[i].nextCardId = sortCards[i + 1].cardId;
                 sortCards[i].prevCardId = sortCards[i - 1].cardId;
                 sortCards[i].index = i;
@@ -320,20 +307,6 @@ const sortCardsByNextId = (
             sortCards[0].nextCardId = "";
             sortCards[0].prevCardId = "";
             sortCards[0].index = 0;
-        }
-
-        if (lostCards.length) {
-            addMessage("自動更新 迷路 Cards", "Common");
-
-            updateBatchCard(
-                sortCards.map((sortCard) => ({
-                    id: sortCard.cardId,
-                    content: sortCard.content,
-                    listId: sortCard.listId,
-                    name: sortCard.name,
-                    nextCardId: sortCard.nextCardId,
-                }))
-            );
         }
 
         listCard.cards = sortCards;
@@ -420,7 +393,7 @@ export const resortListCards = (
     }
 };
 
-export const useSubListCardDatas = (): ListCardDatasCollection | null => {
+export const useSubListCardDatas = (): ListCardDatasCollection => {
     const refIsMount = useGetMount();
     const refSubLists = useRef<undefined | (() => void)>(undefined);
     const refSubCards = useRef<undefined | (() => void)>(undefined);
@@ -428,8 +401,13 @@ export const useSubListCardDatas = (): ListCardDatasCollection | null => {
 
     const [lists, setLists] = useState<List[]>([]);
     const [cards, setCards] = useState<Card[]>([]);
-    const [listCardDatas, setListCardDatas] =
-        useState<ListCardDatasCollection | null>(null);
+    const [listCardDatas, setListCardDatas] = useState<ListCardDatasCollection>(
+        {
+            listCardDatas: [],
+            lists: [],
+            cards: [],
+        }
+    );
 
     useIfSingIn(
         () => {
@@ -454,8 +432,33 @@ export const useSubListCardDatas = (): ListCardDatasCollection | null => {
                             }
                         });
 
-                        // console.log("tempLists2", tempLists);
-                        setLists(tempLists);
+                        let isSameLists = true;
+                        if (tempLists.length != lists.length) {
+                            isSameLists = false;
+                        } else {
+                            tempLists.forEach((tempList) => {
+                                if (!isSameLists) return;
+
+                                const matchList = lists.find(
+                                    (list) => list.listId === tempList.listId
+                                );
+                                if (typeof matchList === "undefined") {
+                                    isSameLists = false;
+                                    return;
+                                }
+
+                                if (
+                                    matchList.name !== tempList.name ||
+                                    matchList.nextListId !== tempList.nextListId
+                                ) {
+                                    isSameLists = false;
+                                    return;
+                                }
+                            });
+                        }
+
+                        if (!isSameLists) setLists(tempLists);
+                        else console.log("is same list");
                     });
 
                 refSubCards.current = firebase
@@ -482,8 +485,37 @@ export const useSubListCardDatas = (): ListCardDatasCollection | null => {
                             }
                         });
 
-                        // console.log("tempCards", tempCards);
-                        setCards(tempCards);
+                        let isSameCards = true;
+                        if (tempCards.length != cards.length) {
+                            isSameCards = false;
+                        } else {
+                            tempCards.forEach((tempCard) => {
+                                if (!isSameCards) return;
+
+                                const matchCard = cards.find(
+                                    (card) => card.cardId === tempCard.cardId
+                                );
+                                if (typeof matchCard === "undefined") {
+                                    isSameCards = false;
+                                    return;
+                                }
+
+                                if (
+                                    matchCard.name !== tempCard.name ||
+                                    matchCard.listId !== tempCard.listId ||
+                                    matchCard.content !== tempCard.content ||
+                                    matchCard.nextCardId !==
+                                        tempCard.nextCardId ||
+                                    matchCard.name !== tempCard.name
+                                ) {
+                                    isSameCards = false;
+                                    return;
+                                }
+                            });
+                        }
+
+                        if (!isSameCards) setCards(tempCards);
+                        else console.log("is same card");
                     });
             });
         },
@@ -502,17 +534,12 @@ export const useSubListCardDatas = (): ListCardDatasCollection | null => {
 
     useEffect(() => {
         try {
-            const tempListCardDatas = [] as ListCardDatas[];
-            sortListsByNextId(tempListCardDatas, lists);
-            sortCardsByNextId(tempListCardDatas, cards);
-
-            // console.log("refTimerRefreshListCardDatas ###");
             if (refIsMount.current) {
                 if (refTimerRefreshListCardDatas.current < 0) {
-                    // console.log(
-                    //     "refTimerRefreshListCardDatas.current < 0",
-                    //     refTimerRefreshListCardDatas.current
-                    // );
+                    const tempListCardDatas = [] as ListCardDatas[];
+                    sortListsByNextId(tempListCardDatas, lists);
+                    sortCardsByNextId(tempListCardDatas, cards);
+                    // console.log("tempListCardDatas", tempListCardDatas);
                     setListCardDatas({
                         cards: cards,
                         lists: lists,
@@ -522,20 +549,20 @@ export const useSubListCardDatas = (): ListCardDatasCollection | null => {
                     refTimerRefreshListCardDatas.current =
                         refTimerRefreshListCardDatas.current + 1;
                 } else {
-                    // console.log(
-                    //     "refTimerRefreshListCardDatas.current >= 0",
-                    //     refTimerRefreshListCardDatas.current
-                    // );
                     clearTimeout(refTimerRefreshListCardDatas.current);
                     refTimerRefreshListCardDatas.current = window.setTimeout(
                         () => {
+                            const tempListCardDatas = [] as ListCardDatas[];
+                            sortListsByNextId(tempListCardDatas, lists);
+                            sortCardsByNextId(tempListCardDatas, cards);
+                            // console.log("tempListCardDatas", tempListCardDatas);
                             setListCardDatas({
                                 cards: cards,
                                 lists: lists,
                                 listCardDatas: tempListCardDatas,
                             });
                         },
-                        2000
+                        500
                     );
                 }
             }
